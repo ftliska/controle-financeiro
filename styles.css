@@ -1,0 +1,17 @@
+.item-lancamento {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 8px;
+  font-size: 14px;
+}
+
+.btn-delete {
+  background: transparent;
+  border: none;
+  color: #9ca3af;
+  cursor: pointer;
+}
+
+.btn-delete:hover {
+  color: #f87171;
+}
