@@ -176,7 +176,7 @@ export default function App() {
 
         <div className="bg-zinc-900 p-5 rounded-2xl shadow-lg border border-zinc-800 hover:scale-[1.02] transition">
           <p className="flex items-center gap-2 text-sm text-zinc-400">
-            <ArrowDownRight className="text-emerald-400" size={18} />
+            <ArrowDownRight className="text-red-400" size={18} />
             Saídas
           </p>
           <p className="text-2xl font-semibold text-emerald-400 mt-2">
@@ -186,7 +186,7 @@ export default function App() {
 
         <div className="bg-zinc-900 p-5 rounded-2xl shadow-lg border border-zinc-800 hover:scale-[1.02] transition">
           <p className="flex items-center gap-2 text-sm text-zinc-400">
-            <PiggyBank className="text-emerald-400" size={18} />
+            <PiggyBank className="text-blue-400" size={18} />
             Economias
           </p>
           <p className="text-2xl font-semibold text-emerald-400 mt-2">
