@@ -47,9 +47,9 @@ export default function App() {
     ]);
   };
 
-  const updateLancamento = (index, field, value) => {
+  const updateLancamento = (id, field, value) => {
     setLancamentos((prev) =>
-      prev.map((item, i) => (i === index ? { ...item, [field]: value } : item)),
+      prev.map((item) => (item.id === id ? { ...item, [field]: value } : item)),
     );
   };
 
