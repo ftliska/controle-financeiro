@@ -112,33 +112,51 @@ export default function App() {
 
     return (
       <div className="mb-8">
-        <h2 className={`text-lg font-semibold ${color}`}>{titulo}</h2>
-        <table className="w-full text-sm border border-zinc-800 rounded-xl overflow-hidden">
-          <thead className="bg-zinc-900 sticky top-0 z-10">
-            <tr>
-              <th>Categoria</th>
-              {months.map((m) => (
-                <th key={m}>{m}</th>
-              ))}
-              <th>Total</th>
-            </tr>
-          </thead>
-          <tbody>
-            {categorias.map((cat) => {
-              const valores = dataset[cat];
-              const total = valores.reduce((a, b) => a + b, 0);
-              return (
-                <tr key={cat}>
-                  <td>{cat}</td>
-                  {valores.map((v, i) => (
-                    <td key={i}>{format(v)}</td>
-                  ))}
-                  <td>{format(total)}</td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
+        <h2 className={`text-lg font-semibold mb-2 ${color}`}>{titulo}</h2>
+
+        <div className="border border-zinc-800 rounded-xl overflow-hidden">
+          <table className="w-full text-sm border-collapse">
+            <thead className="bg-zinc-900">
+              <tr>
+                <th className="p-2 text-left border-b border-zinc-800">
+                  Categoria
+                </th>
+                {months.map((m) => (
+                  <th key={m} className="p-2 border-b border-zinc-800">
+                    {m}
+                  </th>
+                ))}
+                <th className="p-2 border-b border-zinc-800">Total</th>
+              </tr>
+            </thead>
+
+            <tbody>
+              {categorias.map((cat) => {
+                const valores = dataset[cat];
+                const total = valores.reduce((a, b) => a + b, 0);
+
+                return (
+                  <tr
+                    key={cat}
+                    className="odd:bg-zinc-950 even:bg-zinc-900/50 hover:bg-zinc-800 transition"
+                  >
+                    <td className="p-2">{cat}</td>
+
+                    {valores.map((v, i) => (
+                      <td key={i} className="text-center p-2">
+                        {format(v)}
+                      </td>
+                    ))}
+
+                    <td className="text-center font-semibold p-2">
+                      {format(total)}
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
       </div>
     );
   };
@@ -189,28 +207,31 @@ export default function App() {
         <h2>Lançamentos</h2>
         <button
           onClick={addLancamento}
-          className="bg-emerald-500 hover:bg-emerald-600 transition px-4 py-2 rounded-lg shadow">
+          className="bg-emerald-500 hover:bg-emerald-600 transition px-4 py-2 rounded-lg shadow"
+        >
           + Novo
         </button>
       </div>
 
-      <table className="w-full text-sm border border-zinc-800 rounded-xl overflow-hidden">
-        <thead className="bg-zinc-900 sticky top-0 z-10">
-          <tr>
-            <th>Data Lançamento</th>
-            <th>Data Vencimento</th>
-            <th>Descrição</th>
-            <th>Categoria</th>
-            <th>Lançamento</th>
-            <th>Valor</th>
-            <th>Status</th>
-            <th>Obs</th>
-          </tr>
-        </thead>
+      <div className="border border-zinc-800 rounded-xl overflow-hidden">
+  <table className="w-full text-sm border-collapse">
+    
+    <thead className="bg-zinc-900">
+      <tr>
+        <th className="p-2 border-b border-zinc-800">Data Lançamento</th>
+        <th className="p-2 border-b border-zinc-800">Data Vencimento</th>
+        <th className="p-2 border-b border-zinc-800">Descrição</th>
+        <th className="p-2 border-b border-zinc-800">Categoria</th>
+        <th className="p-2 border-b border-zinc-800">Lançamento</th>
+        <th className="p-2 border-b border-zinc-800">Valor</th>
+        <th className="p-2 border-b border-zinc-800">Status</th>
+        <th className="p-2 border-b border-zinc-800">Obs</th>
+      </tr>
+    </thead>
         <tbody>
           {lancamentos.map((l, i) => (
-            <tr key={l.id} className="border-t border-zinc-800">
-              <td>
+            <tr key={l.id} className="odd:bg-zinc-950 even:bg-zinc-900/50 hover:bg-zinc-800 transition">
+              <td className="p-2">
                 <input
                   type="date"
                   value={l.dataLancamento}
@@ -220,7 +241,7 @@ export default function App() {
                   className="w-full bg-zinc-900 border border-zinc-700 rounded-lg px-2 py-1 focus:outline-none focus:ring-2 focus:ring-emerald-500"
                 />
               </td>
-              <td>
+              <td className="p-2">
                 <input
                   type="date"
                   value={l.dataVencimento}
@@ -230,7 +251,7 @@ export default function App() {
                   className="w-full bg-zinc-900 border border-zinc-700 rounded-lg px-2 py-1 focus:outline-none focus:ring-2 focus:ring-emerald-500"
                 />
               </td>
-              <td>
+              <td className="p-2">
                 <input
                   value={l.descricao}
                   onChange={(e) =>
@@ -239,7 +260,7 @@ export default function App() {
                   className="w-full bg-zinc-900 border border-zinc-700 rounded-lg px-2 py-1 focus:outline-none focus:ring-2 focus:ring-emerald-500"
                 />
               </td>
-              <td>
+              <td className="p-2">
                 <input
                   value={l.categoria}
                   onChange={(e) =>
@@ -248,7 +269,7 @@ export default function App() {
                   className="w-full bg-zinc-900 border border-zinc-700 rounded-lg px-2 py-1 focus:outline-none focus:ring-2 focus:ring-emerald-500"
                 />
               </td>
-              <td>
+              <td className="p-2">
                 <select
                   value={l.tipo}
                   onChange={(e) => updateLancamento(i, "tipo", e.target.value)}
@@ -259,7 +280,7 @@ export default function App() {
                   <option>Investimento</option>
                 </select>
               </td>
-              <td>
+              <td className="p-2">
                 <input
                   value={l.valor}
                   onChange={(e) => updateLancamento(i, "valor", e.target.value)}
@@ -273,7 +294,7 @@ export default function App() {
                   className="w-full bg-zinc-900 border border-zinc-700 rounded-lg px-2 py-1 focus:outline-none focus:ring-2 focus:ring-emerald-500"
                 />
               </td>
-              <td>
+              <td className="p-2">
                 <select
                   value={l.status}
                   onChange={(e) =>
@@ -285,7 +306,7 @@ export default function App() {
                   <option>Pago</option>
                 </select>
               </td>
-              <td>
+              <td className="p-2">
                 <input
                   value={l.obs}
                   onChange={(e) => updateLancamento(i, "obs", e.target.value)}
@@ -296,6 +317,7 @@ export default function App() {
           ))}
         </tbody>
       </table>
+      </div>
     </div>
   );
 
