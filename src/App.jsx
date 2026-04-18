@@ -114,7 +114,7 @@ export default function App() {
       <div className="mb-8">
         <h2 className={`text-lg font-semibold ${color}`}>{titulo}</h2>
         <table className="w-full text-sm border border-zinc-800 rounded-xl overflow-hidden">
-          <thead className="flex items-center justify-between px-6 py-4 border-b border-zinc-800 bg-zinc-950 sticky top-0 z-20">
+          <thead className="bg-zinc-900 sticky top-0 z-10">
             <tr>
               <th>Categoria</th>
               {months.map((m) => (
