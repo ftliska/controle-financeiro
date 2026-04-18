@@ -1,11 +1,32 @@
 import { useState, useMemo } from "react";
-import { ArrowUpRight, ArrowDownRight, PiggyBank, Home, List, Settings, Wallet } from "lucide-react";
+import {
+  ArrowUpRight,
+  ArrowDownRight,
+  PiggyBank,
+  Home,
+  List,
+  Settings,
+  Wallet,
+} from "lucide-react";
 
 export default function App() {
   const [page, setPage] = useState("home");
   const [year] = useState(2026);
 
-  const months = ["Jan","Fev","Mar","Abr","Mai","Jun","Jul","Ago","Set","Out","Nov","Dez"];
+  const months = [
+    "Jan",
+    "Fev",
+    "Mar",
+    "Abr",
+    "Mai",
+    "Jun",
+    "Jul",
+    "Ago",
+    "Set",
+    "Out",
+    "Nov",
+    "Dez",
+  ];
 
   const [lancamentos, setLancamentos] = useState([]);
 
@@ -22,12 +43,12 @@ export default function App() {
         valor: "",
         status: "Previsto",
         obs: "",
-      }
+      },
     ]);
   };
 
   const updateLancamento = (index, field, value) => {
-    setLancamentos(prev => {
+    setLancamentos((prev) => {
       const updated = [...prev];
       updated[index] = { ...updated[index], [field]: value };
       return updated;
@@ -37,7 +58,10 @@ export default function App() {
   const formatCurrencyInput = (value) => {
     const numeric = value.replace(/\D/g, "");
     const number = Number(numeric) / 100;
-    return number.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+    return number.toLocaleString("pt-BR", {
+      style: "currency",
+      currency: "BRL",
+    });
   };
 
   const parseCurrency = (value) => {
@@ -47,7 +71,7 @@ export default function App() {
   const processData = useMemo(() => {
     const data = { entradas: {}, saidas: {}, economias: {} };
 
-    lancamentos.forEach(l => {
+    lancamentos.forEach((l) => {
       if (!l.dataVencimento || !l.valor) return;
 
       const date = new Date(l.dataVencimento);
@@ -69,14 +93,17 @@ export default function App() {
     return data;
   }, [lancamentos, year]);
 
-  const format = (v) => v ? `R$ ${v.toLocaleString("pt-BR")}` : "-";
+  const format = (v) => (v ? `R$ ${v.toLocaleString("pt-BR")}` : "-");
 
-  const summary = useMemo(()=>{
-    const sum = (obj) => Object.values(obj).flat().reduce((a,b)=>a+b,0);
+  const summary = useMemo(() => {
+    const sum = (obj) =>
+      Object.values(obj)
+        .flat()
+        .reduce((a, b) => a + b, 0);
     return {
       entradas: sum(processData.entradas),
       saidas: sum(processData.saidas),
-      economias: sum(processData.economias)
+      economias: sum(processData.economias),
     };
   }, [processData]);
 
@@ -86,22 +113,26 @@ export default function App() {
     return (
       <div className="mb-8">
         <h2 className={`text-lg font-semibold ${color}`}>{titulo}</h2>
-        <table className="w-full text-sm border border-zinc-800">
-          <thead className="bg-zinc-800">
+        <table className="w-full text-sm border border-zinc-800 rounded-xl overflow-hidden">
+          <thead className="flex items-center justify-between px-6 py-4 border-b border-zinc-800 bg-zinc-950 sticky top-0 z-20">
             <tr>
               <th>Categoria</th>
-              {months.map(m => <th key={m}>{m}</th>)}
+              {months.map((m) => (
+                <th key={m}>{m}</th>
+              ))}
               <th>Total</th>
             </tr>
           </thead>
           <tbody>
-            {categorias.map(cat => {
+            {categorias.map((cat) => {
               const valores = dataset[cat];
-              const total = valores.reduce((a,b)=>a+b,0);
+              const total = valores.reduce((a, b) => a + b, 0);
               return (
                 <tr key={cat}>
                   <td>{cat}</td>
-                  {valores.map((v,i)=>(<td key={i}>{format(v)}</td>))}
+                  {valores.map((v, i) => (
+                    <td key={i}>{format(v)}</td>
+                  ))}
                   <td>{format(total)}</td>
                 </tr>
               );
@@ -113,39 +144,58 @@ export default function App() {
   };
 
   const HomePage = () => (
-    <div className="p-6">
+    <div className="max-w-7xl mx-auto px-6 py-6">
       <div className="grid grid-cols-3 gap-4 mb-6">
-        <div className="bg-zinc-900 p-4 rounded">
-          <p className="flex gap-2 text-sm"><ArrowUpRight className="text-emerald-400" size={16}/> Entradas</p>
-          <p className="text-emerald-400 text-xl">{format(summary.entradas)}</p>
+        <div className="bg-zinc-900 p-5 rounded-2xl shadow-lg border border-zinc-800 hover:scale-[1.02] transition">
+          <p className="flex items-center gap-2 text-sm text-zinc-400">
+            <ArrowUpRight className="text-emerald-400" size={18} />
+            Entradas
+          </p>
+          <p className="text-2xl font-semibold text-emerald-400 mt-2">
+            {format(summary.entradas)}
+          </p>
         </div>
 
-        <div className="bg-zinc-900 p-4 rounded">
-          <p className="flex gap-2 text-sm"><ArrowDownRight className="text-red-400" size={16}/> Saídas</p>
-          <p className="text-red-400 text-xl">{format(summary.saidas)}</p>
+        <div className="bg-zinc-900 p-5 rounded-2xl shadow-lg border border-zinc-800 hover:scale-[1.02] transition">
+          <p className="flex items-center gap-2 text-sm text-zinc-400">
+            <ArrowUpRight className="text-emerald-400" size={18} />
+            Saídas
+          </p>
+          <p className="text-2xl font-semibold text-emerald-400 mt-2">
+            {format(summary.saidas)}
+          </p>
         </div>
 
-        <div className="bg-zinc-900 p-4 rounded">
-          <p className="flex gap-2 text-sm"><PiggyBank className="text-blue-400" size={16}/> Economias</p>
-          <p className="text-blue-400 text-xl">{format(summary.economias)}</p>
+        <div className="bg-zinc-900 p-5 rounded-2xl shadow-lg border border-zinc-800 hover:scale-[1.02] transition">
+          <p className="flex items-center gap-2 text-sm text-zinc-400">
+            <ArrowUpRight className="text-emerald-400" size={18} />
+            Economias
+          </p>
+          <p className="text-2xl font-semibold text-emerald-400 mt-2">
+            {format(summary.economias)}
+          </p>
         </div>
       </div>
 
-      {renderTabelaHome("Entradas","text-emerald-400",processData.entradas)}
-      {renderTabelaHome("Saídas","text-red-400",processData.saidas)}
-      {renderTabelaHome("Economias","text-blue-400",processData.economias)}
+      {renderTabelaHome("Entradas", "text-emerald-400", processData.entradas)}
+      {renderTabelaHome("Saídas", "text-red-400", processData.saidas)}
+      {renderTabelaHome("Economias", "text-blue-400", processData.economias)}
     </div>
   );
 
   const LancamentosPage = () => (
-    <div className="p-6">
+    <div className="max-w-7xl mx-auto px-6 py-6">
       <div className="flex justify-between mb-4">
         <h2>Lançamentos</h2>
-        <button onClick={addLancamento} className="bg-emerald-500 px-3 py-1 rounded">+ Novo</button>
+        <button
+          onClick={addLancamento}
+          className="bg-emerald-500 hover:bg-emerald-600 transition px-4 py-2 rounded-lg shadow">
+          + Novo
+        </button>
       </div>
 
-      <table className="w-full text-sm border border-zinc-800">
-        <thead className="bg-zinc-800">
+      <table className="w-full text-sm border border-zinc-800 rounded-xl overflow-hidden">
+        <thead className="bg-zinc-900 sticky top-0 z-10">
           <tr>
             <th>Data Lançamento</th>
             <th>Data Vencimento</th>
@@ -158,14 +208,52 @@ export default function App() {
           </tr>
         </thead>
         <tbody>
-          {lancamentos.map((l,i)=>(
+          {lancamentos.map((l, i) => (
             <tr key={l.id} className="border-t border-zinc-800">
-              <td><input type="date" value={l.dataLancamento} onChange={e=>updateLancamento(i,"dataLancamento",e.target.value)} className="w-full bg-zinc-900"/></td>
-              <td><input type="date" value={l.dataVencimento} onChange={e=>updateLancamento(i,"dataVencimento",e.target.value)} className="w-full bg-zinc-900"/></td>
-              <td><input value={l.descricao} onChange={e=>updateLancamento(i,"descricao",e.target.value)} className="w-full bg-zinc-900"/></td>
-              <td><input value={l.categoria} onChange={e=>updateLancamento(i,"categoria",e.target.value)} className="w-full bg-zinc-900"/></td>
               <td>
-                <select value={l.tipo} onChange={e=>updateLancamento(i,"tipo",e.target.value)} className="w-full bg-zinc-900">
+                <input
+                  type="date"
+                  value={l.dataLancamento}
+                  onChange={(e) =>
+                    updateLancamento(i, "dataLancamento", e.target.value)
+                  }
+                  className="w-full bg-zinc-900 border border-zinc-700 rounded-lg px-2 py-1 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                />
+              </td>
+              <td>
+                <input
+                  type="date"
+                  value={l.dataVencimento}
+                  onChange={(e) =>
+                    updateLancamento(i, "dataVencimento", e.target.value)
+                  }
+                  className="w-full bg-zinc-900 border border-zinc-700 rounded-lg px-2 py-1 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                />
+              </td>
+              <td>
+                <input
+                  value={l.descricao}
+                  onChange={(e) =>
+                    updateLancamento(i, "descricao", e.target.value)
+                  }
+                  className="w-full bg-zinc-900 border border-zinc-700 rounded-lg px-2 py-1 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                />
+              </td>
+              <td>
+                <input
+                  value={l.categoria}
+                  onChange={(e) =>
+                    updateLancamento(i, "categoria", e.target.value)
+                  }
+                  className="w-full bg-zinc-900 border border-zinc-700 rounded-lg px-2 py-1 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                />
+              </td>
+              <td>
+                <select
+                  value={l.tipo}
+                  onChange={(e) => updateLancamento(i, "tipo", e.target.value)}
+                  className="w-full bg-zinc-900 border border-zinc-700 rounded-lg px-2 py-1 focus:ring-2 focus:ring-emerald-500"
+                >
                   <option>Receita</option>
                   <option>Despesa</option>
                   <option>Investimento</option>
@@ -174,18 +262,36 @@ export default function App() {
               <td>
                 <input
                   value={l.valor}
-                  onChange={e=>updateLancamento(i,"valor",e.target.value)}
-                  onBlur={e=>updateLancamento(i,"valor",formatCurrencyInput(e.target.value))}
-                  className="w-full bg-zinc-900 text-right"
+                  onChange={(e) => updateLancamento(i, "valor", e.target.value)}
+                  onBlur={(e) =>
+                    updateLancamento(
+                      i,
+                      "valor",
+                      formatCurrencyInput(e.target.value),
+                    )
+                  }
+                  className="w-full bg-zinc-900 border border-zinc-700 rounded-lg px-2 py-1 focus:outline-none focus:ring-2 focus:ring-emerald-500"
                 />
               </td>
               <td>
-                <select value={l.status} onChange={e=>updateLancamento(i,"status",e.target.value)} className="w-full bg-zinc-900">
+                <select
+                  value={l.status}
+                  onChange={(e) =>
+                    updateLancamento(i, "status", e.target.value)
+                  }
+                  className="w-full bg-zinc-900 border border-zinc-700 rounded-lg px-2 py-1 focus:ring-2 focus:ring-emerald-500"
+                >
                   <option>Previsto</option>
                   <option>Pago</option>
                 </select>
               </td>
-              <td><input value={l.obs} onChange={e=>updateLancamento(i,"obs",e.target.value)} className="w-full bg-zinc-900"/></td>
+              <td>
+                <input
+                  value={l.obs}
+                  onChange={(e) => updateLancamento(i, "obs", e.target.value)}
+                  className="w-full bg-zinc-900 border border-zinc-700 rounded-lg px-2 py-1 focus:ring-2 focus:ring-emerald-500"
+                />
+              </td>
             </tr>
           ))}
         </tbody>
@@ -199,10 +305,25 @@ export default function App() {
         <div className="flex gap-4 items-center">
           <Wallet />
           <h1>Planejamento</h1>
-          <nav className="flex gap-4 ml-6">
-            <span onClick={()=>setPage("home")} className="cursor-pointer flex gap-1"><Home size={16}/>Home</span>
-            <span onClick={()=>setPage("lancamentos")} className="cursor-pointer flex gap-1"><List size={16}/>Lançamentos</span>
-            <span className="flex gap-1"><Settings size={16}/>Cadastro</span>
+          <nav className="flex gap-6 ml-6 text-sm text-zinc-400">
+            <span
+              onClick={() => setPage("home")}
+              className="flex items-center gap-1 hover:text-white cursor-pointer"
+            >
+              <Home size={16} />
+              Home
+            </span>
+            <span
+              onClick={() => setPage("lancamentos")}
+              className="flex items-center gap-1 hover:text-white cursor-pointer"
+            >
+              <List size={16} />
+              Lançamentos
+            </span>
+            <span className="flex items-center gap-1 hover:text-white cursor-pointer">
+              <Settings size={16} />
+              Cadastro
+            </span>
           </nav>
         </div>
         <div>Ano: {year}</div>
