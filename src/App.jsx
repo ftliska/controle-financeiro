@@ -207,7 +207,7 @@ export default function App() {
         updateLancamento={updateLancamento}
         addLancamento={addLancamento}
       />
-    );
+    )
   }
 
   return (
