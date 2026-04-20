@@ -85,7 +85,7 @@ export default function CardsHome({
         {MONTHS.map((month, index) => {
           const total =
             monthTotalsEntradas[index] -
-            monthTotalsSaidas[index] +
+            monthTotalsSaidas[index] -
             monthTotalsEconomias[index];
 
           const isNegative = total < 0;
