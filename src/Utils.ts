@@ -1,5 +1,6 @@
 export const formatBRL = (value: number) => {
-  if (!value) return "-";
+  if (value === null || value === undefined) return "-";
+
   return value.toLocaleString("pt-BR", {
     style: "currency",
     currency: "BRL",

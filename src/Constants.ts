@@ -10,7 +10,7 @@ import {
   PiggyBank,
   Droplet,
   CreditCardIcon,
-  HeartPulse
+  HeartPulse,
 } from "lucide-react";
 
 export const MONTHS = [
@@ -206,4 +206,15 @@ export const ICONS_BY_TYPE = {
   Receita: DollarSign,
   Despesa: ArrowDownCircle,
   Investimento: PiggyBank,
+};
+
+export const INITIAL_FORM = {
+  dataVencimento: "",
+  descricao: "",
+  valor: "",
+  status: "Previsto",
+  parcelado: false,
+  parcelasPagas: "",
+  parcelasTotais: "",
+  obs: "",
 };

@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import {
   ArrowUpRight,
   ArrowDownRight,
@@ -11,41 +11,99 @@ import {
 import HomePage from "./HomePage";
 import LancamentosPage from "./LancamentosPage";
 import CadastroPage from "./CadastroPage";
-import { CADASTROS, ICONS_BY_DESCRICAO, ICONS_BY_TYPE } from "./Constants";
+import {
+  CADASTROS,
+  ICONS_BY_DESCRICAO,
+  ICONS_BY_TYPE,
+  INITIAL_FORM,
+} from "./Constants";
+import { parseBRL } from "./Utils";
 
 export default function App() {
   const [page, setPage] = useState("home");
-  const [year] = useState(2026);
+  const [year, setYear] = useState(() => {
+    const saved = Number(localStorage.getItem("selectedYear"));
+    const current = new Date().getFullYear();
 
+    return saved && saved > 2000 && saved < 2100 ? saved : current;
+  });
   const [lancamentos, setLancamentos] = useState([]);
+  const [showModal, setShowModal] = useState(false);
+  const [form, setForm] = useState(INITIAL_FORM);
+  const [editingId, setEditingId] = useState(null);
 
-  const addLancamento = () => {
-    setLancamentos((prev) => [
-      ...prev,
-      {
-        id: crypto.randomUUID(),
-        dataLancamento: "",
-        dataVencimento: "",
-        descricao: "",
-        categoria: "",
-        tipo: "Receita",
-        valor: "",
-        status: "Previsto",
-        obs: "",
-        isEditing: true,
-        isNew: true,
-      },
-    ]);
-  };
+  useEffect(() => {
+    localStorage.setItem("selectedYear", year);
+  }, [year]);
 
-  const toggleEdit = (id) => {
-    setLancamentos((prev) =>
-      prev.map((l) => (l.id === id ? { ...l, isEditing: !l.isEditing } : l)),
-    );
-  };
+  const handleConfirm = () => {
+    const cadastro = CADASTROS.find((c) => c.descricao === form.descricao);
+    if (!cadastro) return;
 
-  const deleteLancamento = (id) => {
-    setLancamentos((prev) => prev.filter((l) => l.id !== id));
+    const valor = parseBRL(form.valor);
+    const hoje = new Date().toISOString().split("T")[0];
+
+    if (editingId) {
+      setLancamentos((prev) =>
+        prev.map((l) =>
+          l.id === editingId
+            ? {
+                ...l,
+                dataVencimento: form.dataVencimento,
+                descricao: form.descricao,
+                categoria: cadastro.categoria,
+                tipo: cadastro.tipo,
+                valor: valor,
+                status: form.status,
+                obs: form.obs,
+              }
+            : l,
+        ),
+      );
+    } else {
+      const novos = [];
+
+      if (form.parcelado) {
+        const pagas = Number(form.parcelasPagas) || 0;
+        const total = Number(form.parcelasTotais) || 0;
+        const restantes = total - pagas;
+
+        for (let i = 0; i < restantes; i++) {
+          const data = new Date(form.dataVencimento);
+          data.setMonth(data.getMonth() + i);
+
+          novos.push({
+            id: crypto.randomUUID(),
+            dataLancamento: hoje,
+            dataVencimento: data.toISOString().split("T")[0],
+            descricao: form.descricao,
+            categoria: cadastro.categoria,
+            tipo: cadastro.tipo,
+            valor: valor,
+            status: form.status,
+            obs: `Parcela ${String(pagas + i + 1).padStart(2, "0")}/${total}`,
+          });
+        }
+      } else {
+        novos.push({
+          id: crypto.randomUUID(),
+          dataLancamento: hoje,
+          dataVencimento: form.dataVencimento,
+          descricao: form.descricao,
+          categoria: cadastro.categoria,
+          tipo: cadastro.tipo,
+          valor: valor,
+          status: form.status,
+          obs: form.obs,
+        });
+      }
+
+      setLancamentos((prev) => [...prev, ...novos]);
+    }
+
+    setEditingId(null);
+    setShowModal(false);
+    setForm(INITIAL_FORM);
   };
 
   const updateLancamento = (id, field, value) => {
@@ -54,30 +112,19 @@ export default function App() {
     );
   };
 
-  const saveLancamento = (id) => {
-    setLancamentos((prev) =>
-      prev.map((l) => {
-        if (l.id !== id) return l;
-
-        if (!l.descricao || !l.valor) {
-          alert("Preencha descrição e valor");
-          return l;
-        }
-
-        return { ...l, isEditing: false, isNew: false };
-      }),
-    );
+  const deleteLancamento = (id) => {
+    setLancamentos((prev) => prev.filter((l) => l.id !== id));
   };
 
   const getIcon = (descricao, tipo) => {
-  // prioridade: ícone específico
-  if (ICONS_BY_DESCRICAO[descricao]) {
-    return ICONS_BY_DESCRICAO[descricao];
-  }
+    // prioridade: ícone específico
+    if (ICONS_BY_DESCRICAO[descricao]) {
+      return ICONS_BY_DESCRICAO[descricao];
+    }
 
-  // fallback: tipo
-  return ICONS_BY_TYPE[tipo];
-};
+    // fallback: tipo
+    return ICONS_BY_TYPE[tipo];
+  };
 
   const processData = useMemo(() => {
     const data = { entradas: {}, saidas: {}, economias: {} };
@@ -90,7 +137,7 @@ export default function App() {
 
       const monthIndex = date.getMonth();
       const categoria = l.descricao || "Sem categoria";
-      const valor = l.valor || 0;
+      const valor = l.valor;
 
       let target;
       if (l.tipo === "Receita") target = data.entradas;
@@ -146,7 +193,6 @@ export default function App() {
             </span>
           </nav>
         </div>
-        <div>Ano: {year}</div>
       </div>
 
       {page === "home" && (
@@ -154,16 +200,22 @@ export default function App() {
           summary={summary}
           processData={processData}
           getIcon={getIcon}
+          year={year}
+          setYear={setYear}
         />
       )}
       {page === "lancamentos" && (
         <LancamentosPage
           lancamentos={lancamentos}
           updateLancamento={updateLancamento}
-          addLancamento={addLancamento}
-          toggleEdit={toggleEdit}
           deleteLancamento={deleteLancamento}
-          saveLancamento={saveLancamento}
+          showModal={showModal}
+          setShowModal={setShowModal}
+          form={form}
+          setForm={setForm}
+          handleConfirm={handleConfirm}
+          setEditingId={setEditingId}
+          editingId={editingId}
         />
       )}
       {page === "cadastro" && <CadastroPage />}

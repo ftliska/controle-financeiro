@@ -102,9 +102,32 @@ const renderTabelaHome = (titulo, color, dataset, getIcon, tipo) => {
   );
 };
 
-export default function HomePage({ summary, processData, getIcon }) {
+export default function HomePage({
+  summary,
+  processData,
+  getIcon,
+  year,
+  setYear,
+}) {
+  const currentYear = new Date().getFullYear();
+  const years = Array.from({ length: 5 }, (_, i) => currentYear - 2 + i);
+
   return (
     <div className="max-w-7xl mx-auto px-6 py-6">
+      <div className="flex justify-between items-center mb-6">
+        <h2 className="text-xl font-semibold">Resumo</h2>
+        <select
+          value={year}
+          onChange={(e) => setYear(Number(e.target.value))}
+          className="bg-zinc-900 border border-zinc-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
+        >
+          {years.map((y) => (
+            <option key={y} value={y}>
+              {y}
+            </option>
+          ))}
+        </select>
+      </div>
       <div className="grid grid-cols-3 gap-4 mb-6">
         <div className="bg-[#22242b] p-5 rounded-2xl shadow-lg border border-[#3d4047] hover:scale-[1.02] transition">
           <p className="flex items-center gap-2 text-sm text-zinc-400">
