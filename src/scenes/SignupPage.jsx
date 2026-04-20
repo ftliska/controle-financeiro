@@ -1,33 +1,38 @@
 import { useState } from "react";
-import { supabase } from "../services/supabase";
 import { Mail, Lock, Wallet, ArrowRight, Eye, EyeOff } from "lucide-react";
 import { motion } from "framer-motion";
+import { supabase } from "../services/supabase";
 
-export default function LoginPage({ onLogin, onSwitchToSignup }) {
+export default function SignupPage({ onLogin, onSwitchToLogin }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState("");
-  const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
-  const handleSubmit = async (event) => {
-    event.preventDefault();
+  const handleSubmit = async (e) => {
+    e.preventDefault();
 
-    if (!email || !password) {
-      setError("Preencha e-mail e senha.");
+    if (!email || !password || !confirmPassword) {
+      setError("Preencha todos os campos.");
       return;
     }
 
-    const emailIsValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-    if (!emailIsValid) {
-      setError("Informe um e-mail válido.");
+    if (password.length < 6) {
+      setError("A senha deve ter pelo menos 6 caracteres.");
+      return;
+    }
+
+    if (password !== confirmPassword) {
+      setError("As senhas não coincidem.");
       return;
     }
 
     setError("");
     setLoading(true);
 
-    const { data, error } = await supabase.auth.signInWithPassword({
+    const { data, error } = await supabase.auth.signUp({
       email,
       password,
     });
@@ -35,10 +40,10 @@ export default function LoginPage({ onLogin, onSwitchToSignup }) {
     setLoading(false);
 
     if (error) {
-      console.log(error);
       setError(error.message);
       return;
     }
+
     onLogin(data.user.email);
   };
 
@@ -62,10 +67,10 @@ export default function LoginPage({ onLogin, onSwitchToSignup }) {
             </div>
 
             <div className="text-center">
-              <h1 className="text-2xl font-semibold tracking-wide">
-                Controle Financeiro
-              </h1>
-              <p className="mt-1 text-sm text-zinc-400">Acesse sua conta</p>
+              <h1 className="text-2xl font-semibold">Criar conta</h1>
+              <p className="mt-1 text-sm text-zinc-400">
+                Comece a controlar suas finanças
+              </p>
             </div>
           </div>
 
@@ -84,17 +89,7 @@ export default function LoginPage({ onLogin, onSwitchToSignup }) {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="seu@email.com"
-                  className="
-                    w-full rounded-2xl 
-                    border border-zinc-700 
-                    bg-[#14171F]/80
-                    px-12 py-3 
-                    text-white 
-                    outline-none
-                    transition-all duration-200
-                    focus:border-emerald-400
-                    focus:ring-2 focus:ring-emerald-400/20
-                  "
+                  className="w-full rounded-2xl border border-zinc-700 bg-[#14171F]/80 px-12 py-3 text-white outline-none transition focus:border-emerald-400 focus:ring-2 focus:ring-emerald-400/20"
                 />
               </div>
             </div>
@@ -113,31 +108,38 @@ export default function LoginPage({ onLogin, onSwitchToSignup }) {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••"
-                  className="
-                    w-full rounded-2xl 
-                    border border-zinc-700 
-                    bg-[#14171F]/80
-                    px-12 pr-12 py-3 
-                    text-white 
-                    outline-none
-                    transition-all duration-200
-                    focus:border-emerald-400
-                    focus:ring-2 focus:ring-emerald-400/20
-                  "
+                  className="w-full rounded-2xl border border-zinc-700 bg-[#14171F]/80 px-12 pr-12 py-3 text-white outline-none transition focus:border-emerald-400 focus:ring-2 focus:ring-emerald-400/20"
                 />
 
-                {/* 👁️ Toggle senha */}
                 <button
                   type="button"
                   onClick={() => setShowPassword((prev) => !prev)}
-                  className="absolute right-4 top-1/2 -translate-y-1/2 text-zinc-500 hover:text-white transition"
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-zinc-500 hover:text-white"
                 >
                   {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
                 </button>
               </div>
             </div>
 
-            {/* ERRO COM SHAKE */}
+            {/* CONFIRMAR SENHA */}
+            <div>
+              <label className="text-sm text-zinc-400">Confirmar senha</label>
+              <div className="mt-2 relative">
+                <Lock
+                  className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-500"
+                  size={16}
+                />
+                <input
+                  type="password"
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  placeholder="••••••••"
+                  className="w-full rounded-2xl border border-zinc-700 bg-[#14171F]/80 px-12 py-3 text-white outline-none transition focus:border-emerald-400 focus:ring-2 focus:ring-emerald-400/20"
+                />
+              </div>
+            </div>
+
+            {/* ERRO */}
             <motion.div
               key={error}
               initial={{ x: 0 }}
@@ -153,36 +155,29 @@ export default function LoginPage({ onLogin, onSwitchToSignup }) {
               whileTap={!loading ? { scale: 0.97 } : {}}
               disabled={loading}
               type="submit"
-              className="
-                w-full flex items-center justify-center gap-2
-                rounded-2xl
-                bg-gradient-to-r from-emerald-400 to-sky-400
-                px-4 py-3
-                text-sm font-semibold text-black
-                shadow-lg
-                transition-all duration-200
-                disabled:opacity-60 disabled:cursor-not-allowed
-              "
+              className="w-full flex items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-emerald-400 to-sky-400 px-4 py-3 text-sm font-semibold text-black shadow-lg disabled:opacity-60"
             >
               {loading ? (
                 <div className="w-5 h-5 border-2 border-black border-t-transparent rounded-full animate-spin" />
               ) : (
                 <>
-                  Entrar
+                  Criar conta
                   <ArrowRight size={18} />
                 </>
               )}
             </motion.button>
-            <div className="text-center text-sm text-zinc-400 mt-6">
-              <span>Não tem conta?</span>
+
+            {/* LINK LOGIN */}
+            <p className="text-center text-sm text-zinc-400 mt-4">
+              Já tem conta?{" "}
               <button
                 type="button"
-                onClick={onSwitchToSignup}
-                className="ml-1 text-emerald-400 hover:text-emerald-300 transition"
+                onClick={onSwitchToLogin}
+                className="text-emerald-400 hover:underline"
               >
-                Criar conta →
+                Entrar
               </button>
-            </div>
+            </p>
           </form>
         </div>
       </motion.div>

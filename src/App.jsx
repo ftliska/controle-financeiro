@@ -1,9 +1,11 @@
 import { useState, useMemo, useEffect } from "react";
+import { supabase } from "./services/supabase";
 import { Home, List, Settings, Wallet } from "lucide-react";
 import HomePage from "./scenes/HomePage";
 import LancamentosPage from "./scenes/LancamentosPage";
 import CadastroPage from "./scenes/CadastroPage";
 import LoginPage from "./scenes/LoginPage";
+import SignupPage from "./scenes/SignupPage";
 import { CADASTROS, INITIAL_FORM } from "./Constants";
 import {
   formatDateLocal,
@@ -16,13 +18,9 @@ import ToastConfirmacao from "./components/ToastConfirmacao";
 
 export default function App() {
   const [page, setPage] = useState("home");
-  const [authenticated, setAuthenticated] = useState(() => {
-    return localStorage.getItem("authenticated") === "1";
-  });
-  const [user, setUser] = useState(() => {
-    const savedEmail = localStorage.getItem("userEmail");
-    return savedEmail ? { email: savedEmail } : null;
-  });
+  const [authenticated, setAuthenticated] = useState(false);
+  const [user, setUser] = useState(null);
+  const [isLogin, setIsLogin] = useState(true);
   const [year, setYear] = useState(() => {
     const saved = Number(localStorage.getItem("selectedYear"));
     const current = new Date().getFullYear();
@@ -59,14 +57,42 @@ export default function App() {
     }
   }, [user]);
 
+  useEffect(() => {
+    const getSession = async () => {
+      const { data } = await supabase.auth.getSession();
+
+      if (data.session) {
+        setUser(data.session.user);
+        setAuthenticated(true);
+      }
+    };
+
+    getSession();
+
+    const { data: listener } = supabase.auth.onAuthStateChange(
+      (_event, session) => {
+        if (session) {
+          setUser(session.user);
+          setAuthenticated(true);
+        } else {
+          setUser(null);
+          setAuthenticated(false);
+        }
+      },
+    );
+
+    return () => {
+      listener.subscription.unsubscribe();
+    };
+  }, []);
+
   const handleLogin = (email) => {
     setUser({ email });
     setAuthenticated(true);
   };
 
-  const handleLogout = () => {
-    setAuthenticated(false);
-    setUser(null);
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
   };
 
   const handleConfirm = () => {
@@ -167,7 +193,17 @@ export default function App() {
   }, [processData]);
 
   if (!authenticated) {
-    return <LoginPage onLogin={handleLogin} />;
+    return isLogin ? (
+      <LoginPage
+        onLogin={handleLogin}
+        onSwitchToSignup={() => setIsLogin(false)}
+      />
+    ) : (
+      <SignupPage
+        onLogin={handleLogin}
+        onSwitchToLogin={() => setIsLogin(true)}
+      />
+    );
   }
 
   return (
