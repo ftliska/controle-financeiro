@@ -31,6 +31,7 @@ export default function App() {
   const [showModal, setShowModal] = useState(false);
   const [form, setForm] = useState(INITIAL_FORM);
   const [editingId, setEditingId] = useState(null);
+  const [hidePaid, setHidePaid] = useState(false);
 
   useEffect(() => {
     localStorage.setItem("selectedYear", year);
@@ -216,6 +217,8 @@ export default function App() {
           handleConfirm={handleConfirm}
           setEditingId={setEditingId}
           editingId={editingId}
+          hidePaid={hidePaid}
+          setHidePaid={setHidePaid}
         />
       )}
       {page === "cadastro" && <CadastroPage />}

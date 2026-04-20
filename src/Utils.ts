@@ -1,7 +1,9 @@
-export const formatBRL = (value: number) => {
-  if (value === null || value === undefined) return "-";
+export const formatBRL = (value: number | string) => {
+  const num = Number(value);
 
-  return value.toLocaleString("pt-BR", {
+  if (!num) return "-"; // pega 0, null, undefined, "", etc
+
+  return num.toLocaleString("pt-BR", {
     style: "currency",
     currency: "BRL",
   });

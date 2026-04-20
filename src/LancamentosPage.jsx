@@ -1,4 +1,5 @@
-import { Pencil, X, Check } from "lucide-react";
+import { useState } from "react";
+import { Pencil, X, Check, Plus, EyeOff, Eye, ArrowUpDown } from "lucide-react";
 import { CADASTROS, INITIAL_FORM } from "./Constants";
 import { formatBRL, parseBRL } from "./Utils";
 
@@ -13,7 +14,10 @@ export default function LancamentosPage({
   setEditingId,
   editingId,
   deleteLancamento,
+  hidePaid,
+  setHidePaid,
 }) {
+  const [isSorted, setIsSorted] = useState(false);
   const getRowStatus = (l) => {
     if (l.status === "Pago") return "normal";
 
@@ -27,15 +31,64 @@ export default function LancamentosPage({
     return "normal";
   };
 
+  const processedLancamentos = [...lancamentos]
+    .filter((l) => (hidePaid ? l.status !== "Pago" : true))
+    .sort((a, b) => {
+      if (!isSorted) return 0;
+
+      const d1 = new Date(a.dataLancamento);
+      const d2 = new Date(b.dataLancamento);
+
+      if (d1.getTime() !== d2.getTime()) {
+        return d1 - d2;
+      }
+
+      const v1 = new Date(a.dataVencimento);
+      const v2 = new Date(b.dataVencimento);
+
+      return v1 - v2;
+    });
+
   return (
     <div className="max-w-7xl mx-auto px-6 py-6">
-      <div className="flex justify-between mb-4">
-        <h2>Lançamentos</h2>
+      <div className="flex gap-2 mb-4">
+        {/* Ordenar */}
         <button
-          onClick={() => setShowModal(true)}
-          className="bg-emerald-500 hover:bg-emerald-600 transition px-4 py-2 rounded-lg shadow"
+          onClick={() => setIsSorted((prev) => !prev)}
+          className="flex items-center gap-2 bg-zinc-800 hover:bg-zinc-700 px-3 py-2 rounded-lg text-sm transition"
         >
-          + Novo
+          <ArrowUpDown size={16} />
+          {isSorted ? "Desfazer ordenação" : "Ordenar"}
+        </button>
+
+        {/* Ocultar */}
+        <button
+          onClick={() => setHidePaid(true)}
+          className="flex items-center gap-2 bg-zinc-800 hover:bg-zinc-700 px-3 py-2 rounded-lg text-sm transition"
+        >
+          <EyeOff size={16} />
+          Ocultar pagos
+        </button>
+
+        {/* Exibir */}
+        <button
+          onClick={() => setHidePaid(false)}
+          className="flex items-center gap-2 bg-zinc-800 hover:bg-zinc-700 px-3 py-2 rounded-lg text-sm transition"
+        >
+          <Eye size={16} />
+          Exibir todos
+        </button>
+
+        {/* Novo */}
+        <button
+          onClick={() => {
+            setForm(INITIAL_FORM);
+            setShowModal(true);
+          }}
+          className="flex items-center gap-2 bg-emerald-500 hover:bg-emerald-600 px-4 py-2 rounded-lg text-sm font-medium transition ml-auto"
+        >
+          <Plus size={16} />
+          Adicionar lançamento
         </button>
       </div>
 
@@ -73,7 +126,7 @@ export default function LancamentosPage({
             </tr>
           </thead>
           <tbody>
-            {lancamentos
+            {processedLancamentos
               .filter((l) => l && l.id)
               .map((l) => (
                 <tr
