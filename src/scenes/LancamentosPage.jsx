@@ -4,6 +4,7 @@ import { CADASTROS, INITIAL_FORM } from "../Constants";
 import ModalCadastro from "../components/ModalCadastro";
 import ButtonsLancamento from "../components/ButtonsLancamento";
 import TabelaLancamentos from "../components/TabelaLancamentos";
+import ModalConfirmDelete from "../components/ModalConfirmDelete";
 
 export default function LancamentosPage({
   lancamentos,
@@ -18,8 +19,10 @@ export default function LancamentosPage({
   deleteLancamento,
   hidePaid,
   setHidePaid,
+  showToast,
 }) {
   const [isSorted, setIsSorted] = useState(false);
+  const [confirmDelete, setConfirmDelete] = useState(null);
 
   return (
     <div className="max-w-7xl mx-auto px-6 py-6">
@@ -40,6 +43,8 @@ export default function LancamentosPage({
         hidePaid={hidePaid}
         lancamentos={lancamentos}
         isSorted={isSorted}
+        showToast={showToast}
+        setConfirmDelete={setConfirmDelete}
       />
 
       {showModal && (
@@ -49,6 +54,15 @@ export default function LancamentosPage({
           editingId={editingId}
           setShowModal={setShowModal}
           handleConfirm={handleConfirm}
+        />
+      )}
+
+      {confirmDelete && (
+        <ModalConfirmDelete
+          setConfirmDelete={setConfirmDelete}
+          deleteLancamento={deleteLancamento}
+          confirmDelete={confirmDelete}
+          showToast={showToast}
         />
       )}
     </div>

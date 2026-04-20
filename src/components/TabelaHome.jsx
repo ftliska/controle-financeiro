@@ -1,6 +1,6 @@
 import { MONTHS } from "../Constants";
 import { formatBRL } from "../Utils";
-
+import { motion } from "framer-motion";
 
 export default function TabelaHome({ dataset, getIcon, color, titulo, tipo }) {
   const categorias = Object.keys(dataset).sort((a, b) =>
@@ -40,16 +40,32 @@ export default function TabelaHome({ dataset, getIcon, color, titulo, tipo }) {
             </tr>
           </thead>
 
-          <tbody>
+          <motion.tbody
+            initial="hidden"
+            animate="visible"
+            variants={{
+              hidden: {},
+              visible: {
+                transition: {
+                  staggerChildren: 0.04,
+                },
+              },
+            }}
+          >
             {categorias.map((cat) => {
               const valores = dataset[cat];
               const total = valores.reduce((a, b) => a + b, 0);
               const Icon = getIcon(cat, tipo);
 
               return (
-                <tr
+                <motion.tr
                   key={cat}
-                  className="odd:bg-zinc-950 even:bg-zinc-900/50 hover:bg-zinc-800 transition"
+                  variants={{
+                    hidden: { opacity: 0, y: 8 },
+                    visible: { opacity: 1, y: 0 },
+                  }}
+                  transition={{ duration: 0.5 }}
+                  className="odd:bg-zinc-950 even:bg-zinc-900/50 hover:bg-zinc-800/80 transition-colors duration-200"
                 >
                   {/* Categoria */}
                   <td className="p-2">
@@ -73,13 +89,19 @@ export default function TabelaHome({ dataset, getIcon, color, titulo, tipo }) {
                   <td className="p-2 text-center font-semibold whitespace-nowrap">
                     {formatBRL(total)}
                   </td>
-                </tr>
+                </motion.tr>
               );
             })}
-          </tbody>
+          </motion.tbody>
 
           <tfoot className="bg-[#1a1c22] border-t border-[#3d4047]">
-            <tr>
+            <motion.tr
+              variants={{
+                hidden: { opacity: 0, y: 8 },
+                visible: { opacity: 1, y: 0 },
+              }}
+              transition={{ duration: 0.5 }}
+            >
               <td className="p-2 text-center font-semibold">Total</td>
 
               {monthTotals.map((total, i) => (
@@ -94,7 +116,7 @@ export default function TabelaHome({ dataset, getIcon, color, titulo, tipo }) {
               <td className="p-2 text-center font-bold whitespace-nowrap">
                 {formatBRL(grandTotal)}
               </td>
-            </tr>
+            </motion.tr>
           </tfoot>
         </table>
       </div>

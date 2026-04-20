@@ -1,16 +1,17 @@
 import { Pencil, X } from "lucide-react";
 import { CADASTROS } from "../Constants";
 import { formatDateLocal, formatBRL, parseBRL } from "../Utils";
+import ModalConfirmDelete from "./ModalConfirmDelete";
 
 export default function TabelaLancamentos({
   updateLancamento,
-  deleteLancamento,
   setEditingId,
   setForm,
   setShowModal,
   hidePaid,
   lancamentos,
   isSorted,
+  setConfirmDelete,
 }) {
   const getRowStatus = (l) => {
     if (l.status === "Pago") return "normal";
@@ -198,7 +199,7 @@ export default function TabelaLancamentos({
                         setForm({
                           dataVencimento: l.dataVencimento,
                           descricao: l.descricao,
-                          valor: formatBRL(l.valor),
+                          valor: l.valor,
                           status: l.status,
                           parcelado: false,
                           parcelasPagas: "",
@@ -215,7 +216,7 @@ export default function TabelaLancamentos({
                       />
                     </button>
 
-                    <button onClick={() => deleteLancamento(l.id)}>
+                    <button onClick={() => setConfirmDelete(l.id)}>
                       <X size={16} className="text-red-400 hover:scale-110" />
                     </button>
                   </div>

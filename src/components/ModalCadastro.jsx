@@ -1,9 +1,15 @@
 import { CADASTROS, INITIAL_FORM } from "../Constants";
 
-export default function ModalCadastro({ form, setForm, editingId, setShowModal, handleConfirm }) {
+export default function ModalCadastro({
+  form,
+  setForm,
+  editingId,
+  setShowModal,
+  handleConfirm,
+}) {
   return (
-    <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50">
-      <div className="bg-zinc-900 w-full max-w-lg rounded-2xl border border-zinc-800 shadow-2xl p-6 animate-fadeIn">
+    <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 animate-fadeIn">
+      <div className="bg-zinc-900 w-full max-w-lg rounded-2xl border border-zinc-800 shadow-2xl p-6 animate-scaleIn">
         {/* HEADER */}
         <div className="mb-6">
           <h2 className="text-xl font-semibold text-white">
@@ -48,17 +54,19 @@ export default function ModalCadastro({ form, setForm, editingId, setShowModal, 
           <div>
             <label className="label">Valor</label>
             <input
-              value={form.valor}
+              value={
+                form.valor
+                  ? `R$ ${(Number(form.valor) / 100).toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
+                  : ""
+              }
               onChange={(e) => {
-                const raw = e.target.value.replace(/\D/g, "");
-                const formatted = raw
-                  ? (Number(raw) / 100).toLocaleString("pt-BR", {
-                      style: "currency",
-                      currency: "BRL",
-                    })
-                  : "";
-
-                setForm({ ...form, valor: formatted });
+                const numeric = e.target.value.replace(/\D/g, "");
+                setForm({ ...form, valor: numeric });
+              }}
+              onBlur={() => {
+                if (!form.valor) {
+                  setForm({ ...form, valor: "" });
+                }
               }}
               className="input"
               placeholder="R$ 0,00"

@@ -13,7 +13,16 @@ export const formatBRL = (value: number | string) => {
 
 export const parseBRL = (value: string | number) => {
   const str = String(value);
+
+  // Se é um número já processado, retorna direto
+  if (!isNaN(Number(str)) && !str.includes(",") && !str.includes(".")) {
+    return Number(str);
+  }
+
+  // Remove tudo que não é dígito
   const numeric = str.replace(/\D/g, "");
+
+  // Divide por 100 para converter centavos em reais
   return Number(numeric) / 100;
 };
 

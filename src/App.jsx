@@ -7,12 +7,12 @@ import LoginPage from "./scenes/LoginPage";
 import { CADASTROS, INITIAL_FORM } from "./Constants";
 import {
   formatDateLocal,
-  parseBRL,
   parseDateLocal,
   createLancamentos,
   getIcon,
 } from "./Utils";
 import NavbarHeader from "./components/NavbarHeader";
+import ToastConfirmacao from "./components/ToastConfirmacao";
 
 export default function App() {
   const [page, setPage] = useState("home");
@@ -37,6 +37,7 @@ export default function App() {
   const [form, setForm] = useState(INITIAL_FORM);
   const [editingId, setEditingId] = useState(null);
   const [hidePaid, setHidePaid] = useState(false);
+  const [toast, setToast] = useState(null);
 
   useEffect(() => {
     localStorage.setItem("selectedYear", year);
@@ -73,7 +74,7 @@ export default function App() {
       const cadastro = CADASTROS.find((c) => c.descricao === form.descricao);
       if (!cadastro) return;
 
-      const valor = parseBRL(String(form.valor));
+      const valor = Number(form.valor);
       const hoje = formatDateLocal(new Date());
 
       if (editingId) {
@@ -98,6 +99,9 @@ export default function App() {
         setLancamentos((prev) => [...prev, ...novos]);
       }
 
+      showToast(
+        `Lançamento ${editingId ? "atualizado" : "criado"} com sucesso!`,
+      );
       setEditingId(null);
       setShowModal(false);
       setForm(INITIAL_FORM);
@@ -117,6 +121,14 @@ export default function App() {
     setLancamentos((prev) => prev.filter((l) => l.id !== id));
   };
 
+  const showToast = (message, type = "success") => {
+    setToast({ message, type });
+
+    setTimeout(() => {
+      setToast(null);
+    }, 2500);
+  };
+
   const processData = useMemo(() => {
     const data = { entradas: {}, saidas: {}, economias: {} };
 
@@ -128,7 +140,7 @@ export default function App() {
 
       const monthIndex = date.getMonth();
       const categoria = l.descricao || "Sem categoria";
-      const valor = parseBRL(l.valor);
+      const valor = Number(l.valor) / 100;
 
       let target;
       if (l.tipo === "Receita") target = data.entradas;
@@ -186,10 +198,13 @@ export default function App() {
           editingId={editingId}
           hidePaid={hidePaid}
           setHidePaid={setHidePaid}
+          showToast={showToast}
         />
       )}
 
       {page === "cadastro" && <CadastroPage />}
+
+      {toast && <ToastConfirmacao toast={toast} />}
     </div>
   );
 }
