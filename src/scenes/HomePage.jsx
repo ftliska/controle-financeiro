@@ -10,7 +10,14 @@ export default function HomePage({
 }) {
   return (
     <div className="mx-auto px-6 py-6">
-      <CardsHome summary={summary} year={year} setYear={setYear} />
+      <CardsHome
+        summary={summary}
+        year={year}
+        setYear={setYear}
+        datasetEntradas={processData.entradas}
+        datasetSaidas={processData.saidas}
+        datasetEconomias={processData.economias}
+      />
 
       <TabelaHome
         dataset={processData.entradas}
