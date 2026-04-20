@@ -8,9 +8,9 @@ import {
   Settings,
   Wallet,
 } from "lucide-react";
-import HomePage from "./HomePage";
-import LancamentosPage from "./LancamentosPage";
-import CadastroPage from "./CadastroPage";
+import HomePage from "./scenes/HomePage";
+import LancamentosPage from "./scenes/LancamentosPage";
+import CadastroPage from "./scenes/CadastroPage";
 import {
   CADASTROS,
   ICONS_BY_DESCRICAO,

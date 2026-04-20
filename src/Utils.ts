@@ -67,4 +67,3 @@ export const createLancamentos = (form, cadastro, valor, hoje) => {
   }
   return novos;
 };
-

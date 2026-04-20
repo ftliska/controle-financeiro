@@ -1,6 +1,6 @@
 import { ArrowUpRight, ArrowDownRight, PiggyBank } from "lucide-react";
-import { MONTHS } from "./Constants";
-import { formatBRL } from "./Utils";
+import { MONTHS } from "../Constants";
+import { formatBRL } from "../Utils";
 
 const renderTabelaHome = (titulo, color, dataset, getIcon, tipo) => {
   const categorias = Object.keys(dataset).sort((a, b) =>

@@ -1,4 +1,4 @@
-import { CADASTROS } from "./Constants";
+import { CADASTROS } from "../Constants";
 
 export default function CadastroPage() {
   return (
