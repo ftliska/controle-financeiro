@@ -1,4 +1,4 @@
-import { Home, List, Settings, Wallet, User } from "lucide-react";
+import { Home, List, Settings, Wallet, User, LogOut } from "lucide-react";
 import { useState } from "react";
 
 export default function NavbarHeader({ setPage, user, onLogout }) {
@@ -58,6 +58,7 @@ export default function NavbarHeader({ setPage, user, onLogout }) {
           onClick={onLogout}
           className="rounded-full border border-zinc-700 bg-zinc-900/80 px-4 py-2 text-xs text-zinc-300 transition hover:border-sky-400 hover:text-white"
         >
+          <LogOut size={16} />
           Sair
         </button>
       </div>

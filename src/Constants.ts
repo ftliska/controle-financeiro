@@ -13,6 +13,7 @@ import {
   HandCoins,
   Landmark,
   BanknoteArrowUp,
+  Gem,
 } from "lucide-react";
 
 export const MONTHS = [
@@ -204,6 +205,7 @@ export const ICONS_BY_DESCRICAO = {
   Dividendos: HandCoins,
   "Renda Fixa": Landmark,
   Transferências: BanknoteArrowUp,
+  PLR: Gem,
 };
 
 export const ICONS_BY_TYPE = {
