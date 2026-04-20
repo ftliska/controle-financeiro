@@ -1,12 +1,15 @@
 import { useState } from "react";
-import { Mail, Lock, Wallet, ArrowRight } from "lucide-react";
+import { Mail, Lock, Wallet, ArrowRight, Eye, EyeOff } from "lucide-react";
+import { motion } from "framer-motion";
 
 export default function LoginPage({ onLogin }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
 
     if (!email || !password) {
@@ -21,74 +24,149 @@ export default function LoginPage({ onLogin }) {
     }
 
     setError("");
-    onLogin(email);
+    setLoading(true);
+
+    // 🔥 simula login (UX melhor)
+    setTimeout(() => {
+      setLoading(false);
+      onLogin(email);
+    }, 1200);
   };
 
   return (
-    <div className="min-h-screen bg-[#14171F] text-white flex items-center justify-center px-4">
-      <div className="relative w-full max-w-sm overflow-hidden rounded-[1.75rem] border border-[#3d4047] bg-[#22242b]/95 py-10 px-8 shadow-[0_15px_50px_rgba(0,0,0,0.35)]">
-        <div className="absolute inset-x-0 top-0 h-24 bg-gradient-to-b from-sky-900/10 to-transparent" />
-        <div className="relative z-10 space-y-8">
-          <div className="flex flex-col items-center gap-4">
-            <div className="flex h-14 w-14 items-center justify-center rounded-full bg-sky-500/10 text-sky-300">
+    <div className="min-h-screen bg-[#14171F] text-white flex items-center justify-center px-4 relative overflow-hidden">
+      {/* BACKGROUND GLOW */}
+      <div className="absolute w-[500px] h-[500px] bg-emerald-500/10 blur-[120px] rounded-full top-[-100px] left-[-100px]" />
+      <div className="absolute w-[400px] h-[400px] bg-sky-500/10 blur-[120px] rounded-full bottom-[-100px] right-[-100px]" />
+
+      <motion.div
+        initial={{ opacity: 0, y: 20, scale: 0.98 }}
+        animate={{ opacity: 1, y: 0, scale: 1 }}
+        transition={{ duration: 0.4 }}
+        className="relative w-full max-w-sm"
+      >
+        <div className="rounded-[2rem] border border-white/5 bg-[#1A1D26]/80 backdrop-blur-xl p-8 shadow-[0_20px_60px_rgba(0,0,0,0.45)]">
+          {/* HEADER */}
+          <div className="flex flex-col items-center gap-4 mb-8">
+            <div className="flex h-14 w-14 items-center justify-center rounded-full bg-emerald-400/10 text-emerald-400 shadow-inner">
               <Wallet size={22} />
             </div>
+
             <div className="text-center">
-              <h1 className="text-2xl font-semibold">Entrar</h1>
-              <p className="mt-2 text-sm text-zinc-400">
-                Acesse seu painel financeiro.
-              </p>
+              <h1 className="text-2xl font-semibold tracking-wide">
+                Controle Financeiro
+              </h1>
+              <p className="mt-1 text-sm text-zinc-400">Acesse sua conta</p>
             </div>
           </div>
 
-          <form onSubmit={handleSubmit} className="">
-            <label className="block text-sm text-zinc-300">
-              E-mail
-              <div className="mt-2 relative">
+          {/* FORM */}
+          <form onSubmit={handleSubmit} className="space-y-4">
+            {/* EMAIL */}
+            <div>
+              <label className="text-sm text-zinc-400">E-mail</label>
+              <div className="mt-2 relative group">
                 <Mail
-                  className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-500"
+                  className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-500 group-focus-within:text-emerald-400 transition"
                   size={16}
                 />
                 <input
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full rounded-3xl border border-[#3d4047] bg-[#14171F] px-12 py-3 text-white outline-none transition focus:border-sky-400 focus:ring-2 focus:ring-sky-400/20"
                   placeholder="seu@email.com"
+                  className="
+                    w-full rounded-2xl 
+                    border border-zinc-700 
+                    bg-[#14171F]/80
+                    px-12 py-3 
+                    text-white 
+                    outline-none
+                    transition-all duration-200
+                    focus:border-emerald-400
+                    focus:ring-2 focus:ring-emerald-400/20
+                  "
                 />
               </div>
-            </label>
+            </div>
 
-            <label className="block text-sm text-zinc-300 mt-4">
-              Senha
-              <div className="mt-2 relative">
+            {/* SENHA */}
+            <div>
+              <label className="text-sm text-zinc-400">Senha</label>
+              <div className="mt-2 relative group">
                 <Lock
-                  className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-500"
+                  className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-500 group-focus-within:text-emerald-400 transition"
                   size={16}
                 />
+
                 <input
-                  type="password"
+                  type={showPassword ? "text" : "password"}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="w-full rounded-3xl border border-[#3d4047] bg-[#14171F] px-12 py-3 text-white outline-none transition focus:border-sky-400 focus:ring-2 focus:ring-sky-400/20"
                   placeholder="••••••••"
+                  className="
+                    w-full rounded-2xl 
+                    border border-zinc-700 
+                    bg-[#14171F]/80
+                    px-12 pr-12 py-3 
+                    text-white 
+                    outline-none
+                    transition-all duration-200
+                    focus:border-emerald-400
+                    focus:ring-2 focus:ring-emerald-400/20
+                  "
                 />
-              </div>
-            </label>
 
-            {error && <p className="text-sm text-rose-400 mt-4">{error}</p>}
-            <div className="flex justify-center mt-10">
-              <button
-                type="submit"
-                className="inline-flex w-[180px] items-center justify-center gap-2 rounded-3xl border border-[#3d4047] bg-[#14171F] px-4 py-3 text-sm font-semibold text-white transition duration-200 hover:bg-sky-400"
-              >
-                Entrar
-                <ArrowRight size={18} />
-              </button>
+                {/* 👁️ Toggle senha */}
+                <button
+                  type="button"
+                  onClick={() => setShowPassword((prev) => !prev)}
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-zinc-500 hover:text-white transition"
+                >
+                  {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                </button>
+              </div>
             </div>
+
+            {/* ERRO COM SHAKE */}
+            <motion.div
+              key={error}
+              initial={{ x: 0 }}
+              animate={error ? { x: [-5, 5, -4, 4, 0] } : {}}
+              transition={{ duration: 0.3 }}
+            >
+              {error && <p className="text-sm text-rose-400">{error}</p>}
+            </motion.div>
+
+            {/* BOTÃO */}
+            <motion.button
+              whileHover={!loading ? { scale: 1.03 } : {}}
+              whileTap={!loading ? { scale: 0.97 } : {}}
+              disabled={loading}
+              type="submit"
+              className="
+                w-full flex items-center justify-center gap-2
+                rounded-2xl
+                bg-gradient-to-r from-emerald-400 to-sky-400
+                px-4 py-3
+                text-sm font-semibold text-black
+                shadow-lg
+                transition-all duration-200
+                disabled:opacity-60 disabled:cursor-not-allowed
+              "
+            >
+              {loading ? (
+                <div className="w-5 h-5 border-2 border-black border-t-transparent rounded-full animate-spin" />
+              ) : (
+                <>
+                  Entrar
+                  <ArrowRight size={18} />
+                </>
+              )}
+            </motion.button>
           </form>
         </div>
-      </div>
+      </motion.div>
     </div>
   );
 }

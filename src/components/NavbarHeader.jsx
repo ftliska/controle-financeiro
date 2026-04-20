@@ -35,7 +35,7 @@ export default function NavbarHeader({ page, setPage, user, onLogout }) {
       className={`
         sticky top-0 z-50
         backdrop-blur-md
-        border-b border-zinc-800
+        border-b border-zinc-700/50
         flex items-center justify-between
         transition-all duration-300
         ${
