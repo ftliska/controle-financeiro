@@ -2,7 +2,7 @@ import { MONTHS } from "../Constants";
 import { formatBRL } from "../Utils";
 import { motion } from "framer-motion";
 
-export default function TabelaHome({ dataset, getIcon, color, titulo, tipo }) {
+export default function TabelaHome({ dataset, getIcon, color, titulo, tipo, year }) {
   const categorias = Object.keys(dataset).sort((a, b) =>
     a.localeCompare(b, "pt-BR"),
   );
@@ -23,7 +23,7 @@ export default function TabelaHome({ dataset, getIcon, color, titulo, tipo }) {
         <table className="w-full text-xs table-fixed border-collapse">
           <thead className="bg-[#22242b]">
             <tr>
-              <th className="p-2 text-left w-[160px] border-b border-[#3d4047]"></th>
+              <th className="p-2 text-left w-[120px] border-b border-[#3d4047]"></th>
 
               {MONTHS.map((m) => (
                 <th
@@ -34,8 +34,8 @@ export default function TabelaHome({ dataset, getIcon, color, titulo, tipo }) {
                 </th>
               ))}
 
-              <th className="p-2 w-[110px] text-center border-b border-[#3d4047]">
-                Total
+              <th className="p-2 w-[90px] text-center border-b border-[#3d4047]">
+                {year}
               </th>
             </tr>
           </thead>

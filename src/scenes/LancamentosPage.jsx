@@ -25,7 +25,7 @@ export default function LancamentosPage({
   const [confirmDelete, setConfirmDelete] = useState(null);
 
   return (
-    <div className="max-w-7xl mx-auto px-6 py-6">
+    <div className="mx-auto px-6 py-6">
       <ButtonsLancamento
         setIsSorted={setIsSorted}
         setHidePaid={setHidePaid}

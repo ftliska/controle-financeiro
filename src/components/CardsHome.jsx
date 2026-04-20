@@ -7,8 +7,7 @@ export default function CardsHome({ summary, setYear, year }) {
 
   return (
     <>
-      <div className="flex justify-between items-center mb-6">
-        <h2 className="text-xl font-semibold">Resumo</h2>
+      <div className="flex justify-center items-center mb-6">
         <select
           value={year}
           onChange={(e) => setYear(Number(e.target.value))}
