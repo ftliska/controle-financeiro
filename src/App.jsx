@@ -172,7 +172,12 @@ export default function App() {
 
   return (
     <div className="min-h-screen bg-[#14171F] text-white">
-      <NavbarHeader setPage={setPage} user={user} onLogout={handleLogout} />
+      <NavbarHeader
+        setPage={setPage}
+        user={user}
+        onLogout={handleLogout}
+        page={page}
+      />
 
       {page === "home" && (
         <HomePage

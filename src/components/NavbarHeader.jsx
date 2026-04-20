@@ -1,9 +1,25 @@
 import { Home, List, Settings, Wallet, User, LogOut } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { motion } from "framer-motion";
 
-export default function NavbarHeader({ setPage, user, onLogout }) {
-  const [activeUnderline, setActiveUnderline] = useState(0);
-  const [hoveredUnderline, setHoveredUnderline] = useState(null);
+export default function NavbarHeader({ page, setPage, user, onLogout }) {
+  const [hovered, setHovered] = useState(null);
+  const [scrolled, setScrolled] = useState(false);
+
+  // 🔥 Detecta scroll (shrink + sombra)
+  useEffect(() => {
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 10);
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  // 🔥 Persistência da página ativa
+  useEffect(() => {
+    localStorage.setItem("activePage", page);
+  }, [page]);
 
   const navItems = [
     { page: "home", icon: Home, label: "Home" },
@@ -12,41 +28,91 @@ export default function NavbarHeader({ setPage, user, onLogout }) {
   ];
 
   return (
-    <div className="flex items-center justify-between p-4 border-b border-zinc-800">
+    <motion.div
+      initial={{ y: -40, opacity: 0 }}
+      animate={{ y: 0, opacity: 1 }}
+      transition={{ duration: 0.4 }}
+      className={`
+        sticky top-0 z-50
+        backdrop-blur-md
+        border-b border-zinc-800
+        flex items-center justify-between
+        transition-all duration-300
+        ${
+          scrolled
+            ? "bg-[#0F1218]/90 shadow-lg py-2 px-6"
+            : "bg-[#0F1218]/60 py-4 px-6"
+        }
+      `}
+    >
+      {/* LEFT */}
       <div className="flex gap-4 items-center">
-        <Wallet />
-        <h1>Controle Financeiro</h1>
-        <nav className="flex gap-6 ml-6 text-sm text-zinc-400 relative">
-          {navItems.map((item, index) => {
+        <Wallet className="text-emerald-400" />
+
+        <h1
+          className={`font-semibold tracking-wide transition-all duration-300 ${
+            scrolled ? "text-sm" : "text-base"
+          }`}
+        >
+          Controle Financeiro
+        </h1>
+
+        {/* NAV */}
+        <nav className="flex gap-6 ml-6 text-sm relative">
+          {navItems.map((item) => {
             const Icon = item.icon;
+            const isActive = page === item.page;
+            const isHover = hovered === item.page;
+
             return (
-              <span
-                key={index}
-                onClick={() => {
-                  setPage(item.page);
-                  setActiveUnderline(index);
-                }}
-                onMouseEnter={() => setHoveredUnderline(index)}
-                onMouseLeave={() => setHoveredUnderline(null)}
-                className="flex items-center gap-1 hover:text-white cursor-pointer relative py-2"
+              <div
+                key={item.page}
+                onClick={() => setPage(item.page)}
+                onMouseEnter={() => setHovered(item.page)}
+                onMouseLeave={() => setHovered(null)}
+                className="relative flex items-center gap-1 cursor-pointer py-2"
               >
-                <Icon size={16} />
-                {item.label}
-                <div
-                  className={`absolute bottom-0 left-0 right-0 h-0.5 bg-white transition-transform duration-300 origin-left ${
-                    hoveredUnderline === index || activeUnderline === index
-                      ? "scale-x-100"
-                      : "scale-x-0"
+                <Icon
+                  size={16}
+                  className={`transition-all duration-200 ${
+                    isActive || isHover
+                      ? "text-white scale-110"
+                      : "text-zinc-400"
                   }`}
                 />
-              </span>
+
+                <span
+                  className={`transition-all duration-200 ${
+                    isActive || isHover ? "text-white" : "text-zinc-400"
+                  }`}
+                >
+                  {item.label}
+                </span>
+
+                {/* UNDERLINE PREMIUM */}
+                {(isActive || isHover) && (
+                  <motion.div
+                    layoutId="underline"
+                    className="absolute -bottom-1 left-0 right-0 h-[2px] bg-gradient-to-r from-emerald-400 to-sky-400 rounded-full"
+                    transition={{ duration: 0.25 }}
+                  />
+                )}
+              </div>
             );
           })}
         </nav>
       </div>
 
+      {/* RIGHT */}
       <div className="flex items-center gap-3">
-        <div className="flex items-center gap-3 rounded-2xl border border-zinc-800 bg-zinc-950/50 px-3 py-2 text-sm text-white">
+        <div
+          className={`
+            flex items-center gap-3 rounded-2xl border border-zinc-800 
+            bg-zinc-900/50 px-3 py-2 text-sm text-white
+            transition-all duration-300
+            ${scrolled ? "scale-95" : "scale-100"}
+          `}
+        >
           <User size={18} className="text-sky-400" />
           <div className="leading-tight">
             <div className="font-medium">{user?.email || "Usuário"}</div>
@@ -56,12 +122,22 @@ export default function NavbarHeader({ setPage, user, onLogout }) {
 
         <button
           onClick={onLogout}
-          className="rounded-full border border-zinc-700 bg-zinc-900/80 px-4 py-2 text-xs text-zinc-300 transition hover:border-sky-400 hover:text-white"
+          className="
+            flex items-center gap-2 rounded-full 
+            border border-zinc-700 
+            bg-zinc-900/70 px-4 py-2 text-xs text-zinc-300
+            transition-all duration-200
+            hover:border-emerald-400 
+            hover:text-white 
+            hover:bg-zinc-800
+            hover:scale-105
+            active:scale-95
+          "
         >
           <LogOut size={16} />
           Sair
         </button>
       </div>
-    </div>
+    </motion.div>
   );
 }
