@@ -10,6 +10,7 @@ import {
   Droplet,
   CreditCardIcon,
   HeartPulse,
+  HandCoins,
 } from "lucide-react";
 
 export const MONTHS = [
@@ -198,6 +199,7 @@ export const ICONS_BY_DESCRICAO = {
   "Cartão Visa": CreditCardIcon,
   "Cartão Master": CreditCardIcon,
   "Cartão Elo": CreditCardIcon,
+  Dividendos: HandCoins,
 };
 
 export const ICONS_BY_TYPE = {

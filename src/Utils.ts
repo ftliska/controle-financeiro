@@ -43,13 +43,17 @@ export const parseDateLocal = (dateString) => {
 };
 
 function getSafeDate(year, month, day) {
+  // cria sempre no meio do dia pra evitar qualquer shift de timezone
+  const temp = new Date(year, month, 15);
+
   // último dia do mês
   const lastDay = new Date(year, month + 1, 0).getDate();
 
-  // usa o menor entre o dia original e o último dia do mês
   const safeDay = Math.min(day, lastDay);
 
-  return new Date(year, month, safeDay);
+  temp.setDate(safeDay);
+
+  return temp;
 }
 
 export const createLancamentos = (form, cadastro, valor, hoje) => {
@@ -65,12 +69,10 @@ export const createLancamentos = (form, cadastro, valor, hoje) => {
       const baseMonth = Number(month) - 1;
       const baseDay = Number(day);
 
-      // calcula novo mês/ano manualmente
       const newMonth = baseMonth + i;
       const newYear = baseYear + Math.floor(newMonth / 12);
-      const adjustedMonth = newMonth % 12;
+      const adjustedMonth = ((newMonth % 12) + 12) % 12;
 
-      // cria data segura
       const data = getSafeDate(newYear, adjustedMonth, baseDay);
       novos.push({
         id: crypto.randomUUID(),
@@ -82,6 +84,13 @@ export const createLancamentos = (form, cadastro, valor, hoje) => {
         valor: valorEmCentavos,
         status: form.status,
         obs: `Parcela ${String(pagas + i + 1).padStart(2, "0")}/${total}`,
+      });
+      console.log({
+        parcela: i,
+        year: newYear,
+        month: adjustedMonth,
+        day: baseDay,
+        final: formatDateLocal(data),
       });
     }
   } else {
