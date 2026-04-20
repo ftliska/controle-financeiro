@@ -11,6 +11,8 @@ import {
   CreditCardIcon,
   HeartPulse,
   HandCoins,
+  Landmark,
+  BanknoteArrowUp,
 } from "lucide-react";
 
 export const MONTHS = [
@@ -200,6 +202,8 @@ export const ICONS_BY_DESCRICAO = {
   "Cartão Master": CreditCardIcon,
   "Cartão Elo": CreditCardIcon,
   Dividendos: HandCoins,
+  "Renda Fixa": Landmark,
+  Transferências: BanknoteArrowUp,
 };
 
 export const ICONS_BY_TYPE = {
