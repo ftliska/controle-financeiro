@@ -368,8 +368,15 @@ export default function LancamentosPage({
                   Pagamento parcelado
                 </label>
 
-                {form.parcelado && (
-                  <div className="flex gap-2 mt-3">
+                <div
+                  className={`transition-all duration-300 ease-out ${
+                    form.parcelado
+                      ? "max-h-24 opacity-100 mt-3 overflow-visible"
+                      : "max-h-0 opacity-0 mt-0 overflow-hidden"
+                  }`}
+                  aria-hidden={!form.parcelado}
+                >
+                  <div className="flex gap-2">
                     <input
                       placeholder="Pagas"
                       value={form.parcelasPagas}
@@ -381,7 +388,7 @@ export default function LancamentosPage({
                             .slice(0, 2),
                         })
                       }
-                      className="input"
+                      className="input text-center !w-20 flex-shrink-0"
                     />
                     <input
                       placeholder="Total"
@@ -394,10 +401,10 @@ export default function LancamentosPage({
                             .slice(0, 2),
                         })
                       }
-                      className="input"
+                      className="input text-center !w-20 flex-shrink-0"
                     />
                   </div>
-                )}
+                </div>
               </div>
 
               {/* Observações */}
