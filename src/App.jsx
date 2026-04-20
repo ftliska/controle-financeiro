@@ -1,13 +1,5 @@
 import { useState, useMemo, useEffect } from "react";
-import {
-  ArrowUpRight,
-  ArrowDownRight,
-  PiggyBank,
-  Home,
-  List,
-  Settings,
-  Wallet,
-} from "lucide-react";
+import { Home, List, Settings, Wallet } from "lucide-react";
 import HomePage from "./scenes/HomePage";
 import LancamentosPage from "./scenes/LancamentosPage";
 import CadastroPage from "./scenes/CadastroPage";
@@ -23,6 +15,7 @@ import {
   parseDateLocal,
   createLancamentos,
 } from "./Utils";
+import NavbarHeader from "./components/NavbarHeader";
 
 export default function App() {
   const [page, setPage] = useState("home");
@@ -151,35 +144,7 @@ export default function App() {
 
   return (
     <div className="min-h-screen bg-[#14171F] text-white">
-      <div className="flex justify-between p-4 border-b border-zinc-800">
-        <div className="flex gap-4 items-center">
-          <Wallet />
-          <h1>Controle Financeiro</h1>
-          <nav className="flex gap-6 ml-6 text-sm text-zinc-400">
-            <span
-              onClick={() => setPage("home")}
-              className="flex items-center gap-1 hover:text-white cursor-pointer"
-            >
-              <Home size={16} />
-              Home
-            </span>
-            <span
-              onClick={() => setPage("lancamentos")}
-              className="flex items-center gap-1 hover:text-white cursor-pointer"
-            >
-              <List size={16} />
-              Lançamentos
-            </span>
-            <span
-              onClick={() => setPage("cadastro")}
-              className="flex items-center gap-1 hover:text-white cursor-pointer"
-            >
-              <Settings size={16} />
-              Cadastro
-            </span>
-          </nav>
-        </div>
-      </div>
+      <NavbarHeader setPage={setPage} />
 
       {page === "home" && (
         <HomePage
@@ -190,6 +155,7 @@ export default function App() {
           setYear={setYear}
         />
       )}
+
       {page === "lancamentos" && (
         <LancamentosPage
           lancamentos={lancamentos}
@@ -206,6 +172,7 @@ export default function App() {
           setHidePaid={setHidePaid}
         />
       )}
+
       {page === "cadastro" && <CadastroPage />}
     </div>
   );
