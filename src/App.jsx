@@ -3,6 +3,7 @@ import { Home, List, Settings, Wallet } from "lucide-react";
 import HomePage from "./scenes/HomePage";
 import LancamentosPage from "./scenes/LancamentosPage";
 import CadastroPage from "./scenes/CadastroPage";
+import LoginPage from "./scenes/LoginPage";
 import { CADASTROS, INITIAL_FORM } from "./Constants";
 import {
   formatDateLocal,
@@ -15,6 +16,13 @@ import NavbarHeader from "./components/NavbarHeader";
 
 export default function App() {
   const [page, setPage] = useState("home");
+  const [authenticated, setAuthenticated] = useState(() => {
+    return localStorage.getItem("authenticated") === "1";
+  });
+  const [user, setUser] = useState(() => {
+    const savedEmail = localStorage.getItem("userEmail");
+    return savedEmail ? { email: savedEmail } : null;
+  });
   const [year, setYear] = useState(() => {
     const saved = Number(localStorage.getItem("selectedYear"));
     const current = new Date().getFullYear();
@@ -39,8 +47,26 @@ export default function App() {
   }, [lancamentos]);
 
   useEffect(() => {
-    localStorage.setItem("lancamentos", JSON.stringify(lancamentos));
-  }, [lancamentos]);
+    localStorage.setItem("authenticated", authenticated ? "1" : "0");
+  }, [authenticated]);
+
+  useEffect(() => {
+    if (user) {
+      localStorage.setItem("userEmail", user.email);
+    } else {
+      localStorage.removeItem("userEmail");
+    }
+  }, [user]);
+
+  const handleLogin = (email) => {
+    setUser({ email });
+    setAuthenticated(true);
+  };
+
+  const handleLogout = () => {
+    setAuthenticated(false);
+    setUser(null);
+  };
 
   const handleConfirm = () => {
     try {
@@ -128,9 +154,13 @@ export default function App() {
     };
   }, [processData]);
 
+  if (!authenticated) {
+    return <LoginPage onLogin={handleLogin} />;
+  }
+
   return (
     <div className="min-h-screen bg-[#14171F] text-white">
-      <NavbarHeader setPage={setPage} />
+      <NavbarHeader setPage={setPage} user={user} onLogout={handleLogout} />
 
       {page === "home" && (
         <HomePage
