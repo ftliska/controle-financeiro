@@ -1,3 +1,5 @@
+import { ICONS_BY_DESCRICAO, ICONS_BY_TYPE } from "./Constants";
+
 export const formatBRL = (value: number | string) => {
   const num = Number(value);
 
@@ -66,4 +68,12 @@ export const createLancamentos = (form, cadastro, valor, hoje) => {
     });
   }
   return novos;
+};
+
+export const getIcon = (descricao, tipo) => {
+  if (ICONS_BY_DESCRICAO[descricao]) {
+    return ICONS_BY_DESCRICAO[descricao];
+  }
+
+  return ICONS_BY_TYPE[tipo];
 };

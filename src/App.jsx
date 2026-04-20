@@ -3,17 +3,13 @@ import { Home, List, Settings, Wallet } from "lucide-react";
 import HomePage from "./scenes/HomePage";
 import LancamentosPage from "./scenes/LancamentosPage";
 import CadastroPage from "./scenes/CadastroPage";
-import {
-  CADASTROS,
-  ICONS_BY_DESCRICAO,
-  ICONS_BY_TYPE,
-  INITIAL_FORM,
-} from "./Constants";
+import { CADASTROS, INITIAL_FORM } from "./Constants";
 import {
   formatDateLocal,
   parseBRL,
   parseDateLocal,
   createLancamentos,
+  getIcon,
 } from "./Utils";
 import NavbarHeader from "./components/NavbarHeader";
 
@@ -95,14 +91,6 @@ export default function App() {
     setLancamentos((prev) => prev.filter((l) => l.id !== id));
   };
 
-  const getIcon = (descricao, tipo) => {
-    if (ICONS_BY_DESCRICAO[descricao]) {
-      return ICONS_BY_DESCRICAO[descricao];
-    }
-
-    return ICONS_BY_TYPE[tipo];
-  };
-
   const processData = useMemo(() => {
     const data = { entradas: {}, saidas: {}, economias: {} };
 
@@ -148,9 +136,9 @@ export default function App() {
         <HomePage
           summary={summary}
           processData={processData}
-          getIcon={getIcon}
           year={year}
           setYear={setYear}
+          getIcon={getIcon}
         />
       )}
 

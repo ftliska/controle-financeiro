@@ -1,14 +1,12 @@
-import { ArrowUpRight, ArrowDownRight, PiggyBank } from "lucide-react";
-import { MONTHS } from "../Constants";
 import CardsHome from "../components/CardsHome";
 import TabelaHome from "../components/TabelaHome";
 
 export default function HomePage({
   summary,
   processData,
-  getIcon,
   year,
   setYear,
+  getIcon,
 }) {
   return (
     <div className="max-w-7xl mx-auto px-6 py-6">
