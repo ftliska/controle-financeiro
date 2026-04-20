@@ -140,7 +140,7 @@ export default function App() {
 
       const monthIndex = date.getMonth();
       const categoria = l.descricao || "Sem categoria";
-      const valor = Number(l.valor) / 100;
+      const valor = Number(l.valor);
 
       let target;
       if (l.tipo === "Receita") target = data.entradas;

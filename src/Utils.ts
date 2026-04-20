@@ -5,7 +5,8 @@ export const formatBRL = (value: number | string) => {
 
   if (!num) return "-"; // pega 0, null, undefined, "", etc
 
-  return num.toLocaleString("pt-BR", {
+  // Divide por 100 pois o valor está armazenado em centavos
+  return (num / 100).toLocaleString("pt-BR", {
     style: "currency",
     currency: "BRL",
   });
@@ -22,8 +23,8 @@ export const parseBRL = (value: string | number) => {
   // Remove tudo que não é dígito
   const numeric = str.replace(/\D/g, "");
 
-  // Divide por 100 para converter centavos em reais
-  return Number(numeric) / 100;
+  // Multiplica por 100 para converter reais em centavos
+  return Number(numeric);
 };
 
 export const formatDateLocal = (date: Date) => {
@@ -43,6 +44,7 @@ export const parseDateLocal = (dateString) => {
 
 export const createLancamentos = (form, cadastro, valor, hoje) => {
   const novos = [];
+  const valorEmCentavos = parseBRL(valor);
   if (form.parcelado) {
     const pagas = Number(form.parcelasPagas) || 0;
     const total = Number(form.parcelasTotais) || 0;
@@ -58,7 +60,7 @@ export const createLancamentos = (form, cadastro, valor, hoje) => {
         descricao: form.descricao,
         categoria: cadastro.categoria,
         tipo: cadastro.tipo,
-        valor: valor,
+        valor: valorEmCentavos,
         status: form.status,
         obs: `Parcela ${String(pagas + i + 1).padStart(2, "0")}/${total}`,
       });
@@ -71,7 +73,7 @@ export const createLancamentos = (form, cadastro, valor, hoje) => {
       descricao: form.descricao,
       categoria: cadastro.categoria,
       tipo: cadastro.tipo,
-      valor: valor,
+      valor: valorEmCentavos,
       status: form.status,
       obs: form.obs,
     });
