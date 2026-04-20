@@ -17,7 +17,12 @@ import {
   ICONS_BY_TYPE,
   INITIAL_FORM,
 } from "./Constants";
-import { parseBRL } from "./Utils";
+import {
+  formatDateLocal,
+  parseBRL,
+  parseDateLocal,
+  createLancamentos,
+} from "./Utils";
 
 export default function App() {
   const [page, setPage] = useState("home");
@@ -27,7 +32,10 @@ export default function App() {
 
     return saved && saved > 2000 && saved < 2100 ? saved : current;
   });
-  const [lancamentos, setLancamentos] = useState([]);
+  const [lancamentos, setLancamentos] = useState(() => {
+    const savedLancamentos = localStorage.getItem("lancamentos");
+    return savedLancamentos ? JSON.parse(savedLancamentos) : [];
+  });
   const [showModal, setShowModal] = useState(false);
   const [form, setForm] = useState(INITIAL_FORM);
   const [editingId, setEditingId] = useState(null);
@@ -37,74 +45,51 @@ export default function App() {
     localStorage.setItem("selectedYear", year);
   }, [year]);
 
+  useEffect(() => {
+    localStorage.setItem("lancamentos", JSON.stringify(lancamentos));
+  }, [lancamentos]);
+
+  useEffect(() => {
+    localStorage.setItem("lancamentos", JSON.stringify(lancamentos));
+  }, [lancamentos]);
+
   const handleConfirm = () => {
-    const cadastro = CADASTROS.find((c) => c.descricao === form.descricao);
-    if (!cadastro) return;
+    try {
+      const cadastro = CADASTROS.find((c) => c.descricao === form.descricao);
+      if (!cadastro) return;
 
-    const valor = parseBRL(form.valor);
-    const hoje = new Date().toISOString().split("T")[0];
+      const valor = parseBRL(String(form.valor));
+      const hoje = formatDateLocal(new Date());
 
-    if (editingId) {
-      setLancamentos((prev) =>
-        prev.map((l) =>
-          l.id === editingId
-            ? {
-                ...l,
-                dataVencimento: form.dataVencimento,
-                descricao: form.descricao,
-                categoria: cadastro.categoria,
-                tipo: cadastro.tipo,
-                valor: valor,
-                status: form.status,
-                obs: form.obs,
-              }
-            : l,
-        ),
-      );
-    } else {
-      const novos = [];
-
-      if (form.parcelado) {
-        const pagas = Number(form.parcelasPagas) || 0;
-        const total = Number(form.parcelasTotais) || 0;
-        const restantes = total - pagas;
-
-        for (let i = 0; i < restantes; i++) {
-          const data = new Date(form.dataVencimento);
-          data.setMonth(data.getMonth() + i);
-
-          novos.push({
-            id: crypto.randomUUID(),
-            dataLancamento: hoje,
-            dataVencimento: data.toISOString().split("T")[0],
-            descricao: form.descricao,
-            categoria: cadastro.categoria,
-            tipo: cadastro.tipo,
-            valor: valor,
-            status: form.status,
-            obs: `Parcela ${String(pagas + i + 1).padStart(2, "0")}/${total}`,
-          });
-        }
+      if (editingId) {
+        setLancamentos((prev) =>
+          prev.map((l) =>
+            l.id === editingId
+              ? {
+                  ...l,
+                  dataVencimento: form.dataVencimento,
+                  descricao: form.descricao,
+                  categoria: cadastro.categoria,
+                  tipo: cadastro.tipo,
+                  valor: valor,
+                  status: form.status,
+                  obs: form.obs,
+                }
+              : l,
+          ),
+        );
       } else {
-        novos.push({
-          id: crypto.randomUUID(),
-          dataLancamento: hoje,
-          dataVencimento: form.dataVencimento,
-          descricao: form.descricao,
-          categoria: cadastro.categoria,
-          tipo: cadastro.tipo,
-          valor: valor,
-          status: form.status,
-          obs: form.obs,
-        });
+        const novos = createLancamentos(form, cadastro, valor, hoje);
+        setLancamentos((prev) => [...prev, ...novos]);
       }
 
-      setLancamentos((prev) => [...prev, ...novos]);
+      setEditingId(null);
+      setShowModal(false);
+      setForm(INITIAL_FORM);
+    } catch (error) {
+      console.error("Erro ao processar o lançamento:", error);
+      return;
     }
-
-    setEditingId(null);
-    setShowModal(false);
-    setForm(INITIAL_FORM);
   };
 
   const updateLancamento = (id, field, value) => {
@@ -133,12 +118,12 @@ export default function App() {
     lancamentos.forEach((l) => {
       if (!l.dataVencimento || !l.valor) return;
 
-      const date = new Date(l.dataVencimento);
-      if (date.getFullYear() !== year) return;
+      const date = parseDateLocal(l.dataVencimento);
+      if (!date || date.getFullYear() !== year) return;
 
       const monthIndex = date.getMonth();
       const categoria = l.descricao || "Sem categoria";
-      const valor = l.valor;
+      const valor = parseBRL(l.valor);
 
       let target;
       if (l.tipo === "Receita") target = data.entradas;

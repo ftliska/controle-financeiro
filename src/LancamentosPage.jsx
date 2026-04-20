@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Pencil, X, Check, Plus, EyeOff, Eye, ArrowUpDown } from "lucide-react";
 import { CADASTROS, INITIAL_FORM } from "./Constants";
-import { formatBRL, parseBRL } from "./Utils";
+import { formatBRL, formatDateLocal, parseBRL } from "./Utils";
 
 export default function LancamentosPage({
   lancamentos,
@@ -21,7 +21,7 @@ export default function LancamentosPage({
   const getRowStatus = (l) => {
     if (l.status === "Pago") return "normal";
 
-    const today = new Date().toISOString().split("T")[0];
+    const today = formatDateLocal(new Date());
 
     if (!l.dataVencimento) return "normal";
 
