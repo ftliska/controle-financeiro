@@ -1,4 +1,3 @@
-import salarioIcon from "./assets/icons/salarioIcon.png";
 import {
   DollarSign,
   Zap,
@@ -142,7 +141,6 @@ export const CADASTROS = [
     categoria: "Renda",
     tipo: "Receita",
     id: crypto.randomUUID(),
-    icon: salarioIcon,
   },
   {
     descricao: "Salário - 13°",

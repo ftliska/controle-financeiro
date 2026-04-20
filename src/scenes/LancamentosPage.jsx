@@ -41,6 +41,7 @@ export default function LancamentosPage({
         lancamentos={lancamentos}
         isSorted={isSorted}
       />
+
       {showModal && (
         <ModalCadastro
           form={form}
