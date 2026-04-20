@@ -52,7 +52,7 @@ export default function CardsHome({
         </select>
       </div>
       <div className="grid grid-cols-4 gap-2 mb-6">
-        <div className="bg-[#22242b] p-5 rounded-2xl shadow-lg border border-[#3d4047] hover:scale-[1.02] transition">
+        <div className="bg-[#22242b] p-5 rounded-2xl shadow-lg border border-[#3d4047]">
           <p className="flex items-center gap-2 text-lg text-zinc-400">
             <TrendingUp className="text-emerald-400" size={24} />
             Entradas
@@ -62,7 +62,7 @@ export default function CardsHome({
           </p>
         </div>
 
-        <div className="bg-[#22242b] p-5 rounded-2xl shadow-lg border border-[#3d4047] hover:scale-[1.02] transition">
+        <div className="bg-[#22242b] p-5 rounded-2xl shadow-lg border border-[#3d4047]">
           <p className="flex items-center gap-2 text-lg text-zinc-400">
             <TrendingDown className="text-red-400" size={24} />
             Saídas
@@ -72,7 +72,7 @@ export default function CardsHome({
           </p>
         </div>
 
-        <div className="bg-[#22242b] p-5 rounded-2xl shadow-lg border border-[#3d4047] hover:scale-[1.02] transition">
+        <div className="bg-[#22242b] p-5 rounded-2xl shadow-lg border border-[#3d4047]">
           <p className="flex items-center gap-2 text-lg text-zinc-400">
             <PiggyBank className="text-blue-400" size={24} />
             Economias
@@ -82,7 +82,7 @@ export default function CardsHome({
           </p>
         </div>
 
-        <div className="bg-[#22242b] p-5 rounded-2xl shadow-lg border border-[#3d4047] hover:scale-[1.02] transition">
+        <div className="bg-[#22242b] p-5 rounded-2xl shadow-lg border border-[#3d4047]">
           <p className="flex items-center gap-2 text-lg text-zinc-400">
             <DollarSign className="text-yellow-400" size={24} />
             Saldo
