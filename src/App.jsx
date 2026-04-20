@@ -96,12 +96,10 @@ export default function App() {
   };
 
   const getIcon = (descricao, tipo) => {
-    // prioridade: ícone específico
     if (ICONS_BY_DESCRICAO[descricao]) {
       return ICONS_BY_DESCRICAO[descricao];
     }
 
-    // fallback: tipo
     return ICONS_BY_TYPE[tipo];
   };
 
