@@ -85,13 +85,6 @@ export const createLancamentos = (form, cadastro, valor, hoje) => {
         status: form.status,
         obs: `Parcela ${String(pagas + i + 1).padStart(2, "0")}/${total}`,
       });
-      console.log({
-        parcela: i,
-        year: newYear,
-        month: adjustedMonth,
-        day: baseDay,
-        final: formatDateLocal(data),
-      });
     }
   } else {
     novos.push({
