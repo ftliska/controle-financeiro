@@ -1,14 +1,22 @@
 import { calcVariation, getBehavior, formatBRL } from "../Utils";
-import { ArrowUpRight, ArrowDownRight } from "lucide-react";
+import { ChevronUp, ChevronDown } from "lucide-react";
 import MiniChart from "./Minichart";
 
-export default function Card ({ title, value, prevValue, icon, color, dataset, type }) {
+export default function Card({
+  title,
+  value,
+  prevValue,
+  icon,
+  color,
+  dataset,
+  type,
+}) {
   const variation = calcVariation(value, prevValue);
   const { isGood } = getBehavior(type, variation);
 
   const isPositive = variation >= 0;
 
-  const Icon = isPositive ? ArrowUpRight : ArrowDownRight;
+  const Icon = isPositive ? ChevronUp : ChevronDown;
 
   return (
     <div className="bg-[#22242b] p-5 rounded-2xl border border-[#3d4047] shadow-lg">
@@ -55,4 +63,4 @@ export default function Card ({ title, value, prevValue, icon, color, dataset, t
       <MiniChart data={dataset} color={color} />
     </div>
   );
-};
+}

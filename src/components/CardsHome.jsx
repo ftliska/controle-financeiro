@@ -8,6 +8,7 @@ import {
   ArrowDownRight,
   CircleArrowUp,
   CircleArrowDown,
+  HandCoins,
 } from "lucide-react";
 import Card from "./Card";
 
@@ -103,7 +104,7 @@ export default function CardsHome({
           )}
           color="#fa8415"
           type="saldo"
-          icon={<DollarSign color="#fa8415" size={28}/>}
+          icon={<HandCoins color="#fa8415" size={28}/>}
         />
       </div>
     </>

@@ -1,9 +1,10 @@
-import { useId } from "react";
-import { motion } from "framer-motion";
+import { useId, useState } from "react";
+import { AnimatePresence, motion } from "framer-motion";
 import { MONTHS } from "../Constants";
 
 const MiniChart = ({ data, color }) => {
   const id = useId();
+  const [hoverIndex, setHoverIndex] = useState(null);
 
   if (!data || data.length === 0) return null;
 
@@ -12,8 +13,10 @@ const MiniChart = ({ data, color }) => {
   const paddingX = 4;
   const paddingY = 14;
 
-  const max = Math.max(...data);
-  const min = Math.min(...data);
+  const safeData = data.map((v) => Number(v) || 0);
+
+  const max = Math.max(...safeData);
+  const min = Math.min(...safeData);
   const range = max - min || 1;
 
   const getX = (i) =>
@@ -22,9 +25,10 @@ const MiniChart = ({ data, color }) => {
   const getY = (v) =>
     height - paddingY - ((v - min) / range) * (height - paddingY * 2);
 
-  const points = data.map((v, i) => ({
+  const points = safeData.map((v, i) => ({
     x: getX(i),
     y: getY(v),
+    value: v / 100,
   }));
 
   const getSmoothPath = (pts) => {
@@ -48,9 +52,15 @@ const MiniChart = ({ data, color }) => {
     ` L ${points[points.length - 1].x} ${height - paddingY}` +
     ` L ${points[0].x} ${height - paddingY} Z`;
 
+  const hoveredPoint = hoverIndex !== null ? points[hoverIndex] : null;
+
   return (
-    <div className="mt-5">
-      <svg width={width} height={height}>
+    <div className="mt-5 relative select-none">
+      <svg
+        width={width}
+        height={height}
+        onMouseLeave={() => setHoverIndex(null)}
+      >
         <defs>
           <linearGradient id={`line-${id}`} x1="0" y1="0" x2="1" y2="0">
             <stop offset="100%" stopColor={color} stopOpacity="0.8" />
@@ -69,6 +79,8 @@ const MiniChart = ({ data, color }) => {
           x2={width - paddingX}
           y1={height - paddingY}
           y2={height - paddingY}
+          stroke="#27272a"
+          strokeWidth="1"
         />
 
         {/* ÁREA */}
@@ -91,6 +103,34 @@ const MiniChart = ({ data, color }) => {
           transition={{ duration: 1, ease: "easeInOut" }}
         />
 
+        {/* INTERAÇÃO (hit area invisível) */}
+        {points.map((p, i) => (
+          <rect
+            key={i}
+            x={p.x - 10}
+            y={0}
+            width={20}
+            height={height}
+            fill="white"
+            opacity="0"
+            style={{ cursor: "pointer" }}
+            onMouseEnter={() => setHoverIndex(i)}
+          />
+        ))}
+
+        {/* LINHA VERTICAL (crosshair) */}
+        {/* {hoveredPoint && (
+          <line
+            x1={hoveredPoint.x}
+            x2={hoveredPoint.x}
+            y1={paddingY}
+            y2={height - paddingY}
+            stroke={color}
+            strokeDasharray="4 4"
+            opacity="0.6"
+          />
+        )} */}
+
         {/* PONTOS */}
         {points.map((p, i) => (
           <g key={i}>
@@ -99,6 +139,42 @@ const MiniChart = ({ data, color }) => {
           </g>
         ))}
       </svg>
+
+      {/* TOOLTIP */}
+      <AnimatePresence mode="wait">
+        {hoveredPoint && (
+          <motion.div
+            key={hoverIndex}
+            initial={{ opacity: 0, y: 8, scale: 0.95 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 6, scale: 0.95 }}
+            transition={{
+              type: "spring",
+              stiffness: 300,
+              damping: 20,
+            }}
+            className="absolute z-50 -translate-x-1/2 -translate-y-full 
+                 bg-zinc-900/95 backdrop-blur-md
+                 border border-zinc-700 text-white 
+                 text-xs px-3 py-2 rounded-lg shadow-xl pointer-events-none"
+            style={{
+              left: hoveredPoint.x,
+              top: hoveredPoint.y - 10,
+            }}
+          >
+            <div className="text-zinc-400 text-[10px]">
+              {MONTHS[hoverIndex]}
+            </div>
+
+            <div className="font-semibold" style={{ color }}>
+              {hoveredPoint.value.toLocaleString("pt-BR", {
+                style: "currency",
+                currency: "BRL",
+              })}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* MESES PERFEITAMENTE ALINHADOS */}
       <div className="relative mt-2 h-4">
