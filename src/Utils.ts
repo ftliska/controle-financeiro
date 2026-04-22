@@ -147,13 +147,13 @@ export const getBehavior = (type, value) => {
   // define se positivo é bom ou ruim
   const isPositive = value >= 0;
 
-  if (type === "entradas" || type === "saldo") {
+  if (type === "entradas") {
     return {
       isGood: isPositive,
     };
   }
 
-  if (type === "saidas") {
+  if (type === "saidas" || type === "saldo") {
     return {
       isGood: !isPositive, // gastar mais é ruim
     };

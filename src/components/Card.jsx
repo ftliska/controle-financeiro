@@ -15,7 +15,7 @@ export default function Card ({ title, value, prevValue, icon, color, dataset, t
       {/* HEADER */}
       <div className="flex items-center gap-3 text-zinc-400">
         <div
-          className="p-2 rounded-xl"
+          className="p-3 rounded-full"
           style={{ backgroundColor: `${color}20` }}
         >
           {icon}

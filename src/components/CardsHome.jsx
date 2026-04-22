@@ -71,7 +71,7 @@ export default function CardsHome({
           dataset={entradasMes}
           color="#00ad6e"
           type="entradas"
-          icon={<CircleArrowUp color="#00ad6e" />}
+          icon={<CircleArrowUp color="#00ad6e" size={28} />}
         />
 
         <Card
@@ -81,7 +81,7 @@ export default function CardsHome({
           dataset={saidasMes}
           color="#f05a5a"
           type="saidas"
-          icon={<CircleArrowDown color="#f05a5a" />}
+          icon={<CircleArrowDown color="#f05a5a" size={28} />}
         />
 
         <Card
@@ -91,7 +91,7 @@ export default function CardsHome({
           dataset={economiasMes}
           color="#60a5fa"
           type="economias"
-          icon={<PiggyBank color="#60a5fa" />}
+          icon={<PiggyBank color="#60a5fa" size={28}/>}
         />
 
         <Card
@@ -103,7 +103,7 @@ export default function CardsHome({
           )}
           color="#fa8415"
           type="saldo"
-          icon={<DollarSign color="#fa8415" />}
+          icon={<DollarSign color="#fa8415" size={28}/>}
         />
       </div>
     </>

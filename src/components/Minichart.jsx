@@ -2,7 +2,7 @@ import { useId } from "react";
 import { motion } from "framer-motion";
 import { MONTHS } from "../Constants";
 
-const MiniChart = ({ data, color = "#34d399" }) => {
+const MiniChart = ({ data, color }) => {
   const id = useId();
 
   if (!data || data.length === 0) return null;
@@ -27,7 +27,6 @@ const MiniChart = ({ data, color = "#34d399" }) => {
     y: getY(v),
   }));
 
-  // 🔥 curva suave
   const getSmoothPath = (pts) => {
     let d = `M ${pts[0].x} ${pts[0].y}`;
 
