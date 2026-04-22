@@ -110,8 +110,58 @@ export const getIcon = (descricao, tipo) => {
   return ICONS_BY_TYPE[tipo];
 };
 
-export const getVariation = (current, prev) => {
-  if (!prev || prev === 0) return null;
+export const getMessage = (type, value) => {
+  const abs = Math.abs(value).toFixed(1);
 
+  if (type === "entradas") {
+    return value >= 0
+      ? `Sua receita aumentou ${abs}%`
+      : `Sua receita caiu ${abs}%`;
+  }
+
+  if (type === "saidas") {
+    return value >= 0
+      ? `Você gastou ${abs}% mais`
+      : `Você reduziu gastos em ${abs}%`;
+  }
+
+  if (type === "economias") {
+    return value >= 0
+      ? `Você guardou ${abs}% mais`
+      : `Você guardou ${abs}% menos`;
+  }
+
+  if (type === "saldo") {
+    return value >= 0
+      ? `Seu saldo melhorou ${abs}%`
+      : `Seu saldo piorou ${abs}%`;
+  }
+};
+
+export const calcVariation = (current, prev) => {
+  if (!prev || prev === 0) return 0;
   return ((current - prev) / prev) * 100;
+};
+
+export const getBehavior = (type, value) => {
+  // define se positivo é bom ou ruim
+  const isPositive = value >= 0;
+
+  if (type === "entradas" || type === "saldo") {
+    return {
+      isGood: isPositive,
+    };
+  }
+
+  if (type === "saidas") {
+    return {
+      isGood: !isPositive, // gastar mais é ruim
+    };
+  }
+
+  if (type === "economias") {
+    return {
+      isGood: isPositive, // guardar mais é bom
+    };
+  }
 };

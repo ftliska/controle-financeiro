@@ -1,4 +1,5 @@
-import { INITIAL_FORM, CADASTROS } from "../Constants";
+import { useEffect, useRef, useState } from "react";
+import { CADASTROS, INITIAL_FORM } from "../Constants";
 
 export default function ModalCadastro({
   form,
@@ -8,8 +9,52 @@ export default function ModalCadastro({
   handleConfirm,
   saving,
 }) {
+  const [error, setError] = useState("");
+  const firstInputRef = useRef(null);
+
   const isDisabled =
     saving || !form.descricao || !form.valor || !form.dataVencimento;
+
+  useEffect(() => {
+    firstInputRef.current?.focus();
+  }, []);
+
+  const onConfirm = async () => {
+    if (!form.descricao) {
+      setError("Selecione uma descrição.");
+      return;
+    }
+
+    if (!form.valor) {
+      setError("Informe um valor.");
+      return;
+    }
+
+    if (!form.dataVencimento) {
+      setError("Informe a data.");
+      return;
+    }
+
+    setError("");
+    await handleConfirm();
+  };
+
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === "Escape") {
+        setShowModal(false);
+        setForm(INITIAL_FORM);
+      }
+
+      if (e.key === "Enter" && !isDisabled) {
+        e.preventDefault();
+        onConfirm();
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [form, saving]);
 
   return (
     <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 animate-fadeIn">
@@ -24,12 +69,15 @@ export default function ModalCadastro({
 
         {/* FORM */}
         <div
-          className={`space-y-4 ${saving ? "opacity-70 pointer-events-none" : ""}`}
+          className={`space-y-4 ${
+            saving ? "opacity-70 pointer-events-none" : ""
+          }`}
         >
           {/* Data */}
           <div>
             <label className="label">Data de vencimento</label>
             <input
+              ref={firstInputRef}
               type="date"
               value={form.dataVencimento}
               onChange={(e) =>
@@ -147,6 +195,13 @@ export default function ModalCadastro({
               placeholder="Opcional..."
             />
           </div>
+
+          {/* ✅ ERRO INLINE */}
+          {error && (
+            <div className="text-sm text-red-400 bg-red-500/10 border border-red-500/20 px-3 py-2 rounded-lg">
+              {error}
+            </div>
+          )}
         </div>
 
         {/* FOOTER */}
@@ -163,7 +218,7 @@ export default function ModalCadastro({
           </button>
 
           <button
-            onClick={handleConfirm}
+            onClick={onConfirm}
             disabled={isDisabled}
             className="
               px-4 py-2 rounded-xl
@@ -176,7 +231,7 @@ export default function ModalCadastro({
             {saving ? (
               <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
             ) : (
-              <>Confirmar</>
+              "Confirmar"
             )}
           </button>
         </div>

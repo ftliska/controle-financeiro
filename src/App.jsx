@@ -31,6 +31,7 @@ export default function App() {
   const [showModal, setShowModal] = useState(false);
   const [form, setForm] = useState(INITIAL_FORM);
   const [editingId, setEditingId] = useState(null);
+  const [confirmDelete, setConfirmDelete] = useState(null);
   const [hidePaid, setHidePaid] = useState(false);
   const [toast, setToast] = useState(null);
 
@@ -161,15 +162,15 @@ export default function App() {
   };
 
   const deleteLancamento = async (id) => {
-    const confirm = window.confirm("Deseja excluir este lançamento?");
-    if (!confirm) return;
-
     const { error } = await supabase.from("lancamentos").delete().eq("id", id);
 
-    if (error) return console.error(error);
+    if (error) {
+      showToast("Erro ao excluir", "error");
+      throw error;
+    }
 
     await loadLancamentos();
-    showToast("Lançamento excluído");
+    showToast("Lançamento excluído com sucesso!");
   };
 
   const updateLancamento = async (id, field, value) => {
@@ -344,6 +345,8 @@ export default function App() {
           setHidePaid={setHidePaid}
           showToast={showToast}
           saving={saving}
+          setConfirmDelete={setConfirmDelete}
+          confirmDelete={confirmDelete}
         />
       )}
 

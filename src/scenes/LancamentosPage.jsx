@@ -22,9 +22,10 @@ export default function LancamentosPage({
   setHidePaid,
   showToast,
   saving,
+  confirmDelete,
+  setConfirmDelete,
 }) {
   const [isSorted, setIsSorted] = useState(false);
-  const [confirmDelete, setConfirmDelete] = useState(null);
 
   return (
     <AnimatePresence mode="wait">
@@ -70,10 +71,14 @@ export default function LancamentosPage({
 
           {confirmDelete && (
             <ModalConfirmDelete
+              confirmDelete={confirmDelete}
               setConfirmDelete={setConfirmDelete}
               deleteLancamento={deleteLancamento}
-              confirmDelete={confirmDelete}
-              showToast={showToast}
+              onConfirm={async () => {
+                await deleteLancamento(confirmDelete);
+                setConfirmDelete(null);
+              }}
+              onCancel={() => setConfirmDelete(null)}
             />
           )}
         </div>

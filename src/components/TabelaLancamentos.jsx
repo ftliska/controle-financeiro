@@ -1,7 +1,6 @@
 import { Pencil, X } from "lucide-react";
 import { CADASTROS } from "../Constants";
 import { formatDateLocal, formatBRL, parseBRL } from "../Utils";
-import ModalConfirmDelete from "./ModalConfirmDelete";
 
 export default function TabelaLancamentos({
   updateLancamento,
