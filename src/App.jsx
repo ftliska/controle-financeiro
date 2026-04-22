@@ -1,6 +1,5 @@
 import { useState, useMemo, useEffect } from "react";
 import { supabase } from "./services/supabase";
-import { Home, List, Settings, Wallet } from "lucide-react";
 import HomePage from "./scenes/HomePage";
 import LancamentosPage from "./scenes/LancamentosPage";
 import CadastroPage from "./scenes/CadastroPage";
@@ -18,19 +17,16 @@ import ToastConfirmacao from "./components/ToastConfirmacao";
 
 export default function App() {
   const [page, setPage] = useState("home");
-  const [authenticated, setAuthenticated] = useState(false);
   const [user, setUser] = useState(null);
   const [isLogin, setIsLogin] = useState(true);
+
   const [year, setYear] = useState(() => {
     const saved = Number(localStorage.getItem("selectedYear"));
     const current = new Date().getFullYear();
-
     return saved && saved > 2000 && saved < 2100 ? saved : current;
   });
-  const [lancamentos, setLancamentos] = useState(() => {
-    const savedLancamentos = localStorage.getItem("lancamentos");
-    return savedLancamentos ? JSON.parse(savedLancamentos) : [];
-  });
+
+  const [lancamentos, setLancamentos] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [form, setForm] = useState(INITIAL_FORM);
   const [editingId, setEditingId] = useState(null);
@@ -42,42 +38,16 @@ export default function App() {
   }, [year]);
 
   useEffect(() => {
-    localStorage.setItem("lancamentos", JSON.stringify(lancamentos));
-  }, [lancamentos]);
-
-  useEffect(() => {
-    localStorage.setItem("authenticated", authenticated ? "1" : "0");
-  }, [authenticated]);
-
-  useEffect(() => {
-    if (user) {
-      localStorage.setItem("userEmail", user.email);
-    } else {
-      localStorage.removeItem("userEmail");
-    }
-  }, [user]);
-
-  useEffect(() => {
     const getSession = async () => {
       const { data } = await supabase.auth.getSession();
-
-      if (data.session) {
-        setUser(data.session.user);
-        setAuthenticated(true);
-      }
+      setUser(data.session?.user ?? null);
     };
 
     getSession();
 
     const { data: listener } = supabase.auth.onAuthStateChange(
       (_event, session) => {
-        if (session) {
-          setUser(session.user);
-          setAuthenticated(true);
-        } else {
-          setUser(null);
-          setAuthenticated(false);
-        }
+        setUser(session?.user ?? null);
       },
     );
 
@@ -86,16 +56,44 @@ export default function App() {
     };
   }, []);
 
-  const handleLogin = (email) => {
-    setUser({ email });
-    setAuthenticated(true);
+  const loadLancamentos = async () => {
+    if (!user) return;
+
+    const { data, error } = await supabase
+      .from("lancamentos")
+      .select("*")
+      .eq("user_id", user.id)
+      .order("data_vencimento", { ascending: true });
+
+    if (error) {
+      console.error(error);
+      return;
+    }
+
+    setLancamentos(
+      data.map((l) => ({
+        id: l.id,
+        dataLancamento: l.data_lancamento,
+        dataVencimento: l.data_vencimento,
+        descricao: l.descricao,
+        categoria: l.categoria,
+        tipo: l.tipo,
+        valor: l.valor,
+        status: l.status,
+        obs: l.obs,
+      })),
+    );
   };
+
+  useEffect(() => {
+    if (user) loadLancamentos();
+  }, [user]);
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
   };
 
-  const handleConfirm = () => {
+  const handleConfirm = async () => {
     try {
       const cadastro = CADASTROS.find((c) => c.descricao === form.descricao);
       if (!cadastro) return;
@@ -104,37 +102,64 @@ export default function App() {
       const hoje = formatDateLocal(new Date());
 
       if (editingId) {
-        setLancamentos((prev) =>
-          prev.map((l) =>
-            l.id === editingId
-              ? {
-                  ...l,
-                  dataVencimento: form.dataVencimento,
-                  descricao: form.descricao,
-                  categoria: cadastro.categoria,
-                  tipo: cadastro.tipo,
-                  valor: valor,
-                  status: form.status,
-                  obs: form.obs,
-                }
-              : l,
-          ),
-        );
+        const { error } = await supabase
+          .from("lancamentos")
+          .update({
+            data_vencimento: form.dataVencimento,
+            descricao: form.descricao,
+            categoria: cadastro.categoria,
+            tipo: cadastro.tipo,
+            valor: valor,
+            status: form.status,
+            obs: form.obs,
+          })
+          .eq("id", editingId);
+
+        if (error) return console.error(error);
       } else {
-        const novos = createLancamentos(form, cadastro, valor, hoje);
-        setLancamentos((prev) => [...prev, ...novos]);
+        const novos = createLancamentos(form, cadastro, valor, hoje).map(
+          (l) => ({
+            user_id: user.id,
+            data_lancamento: l.dataLancamento,
+            data_vencimento: l.dataVencimento,
+            descricao: l.descricao,
+            categoria: l.categoria,
+            tipo: l.tipo,
+            valor: l.valor,
+            status: l.status,
+            obs: l.obs,
+          }),
+        );
+
+        const { error } = await supabase.from("lancamentos").insert(novos);
+
+        if (error) return console.error(error);
       }
+
+      await loadLancamentos();
 
       showToast(
         `Lançamento ${editingId ? "atualizado" : "criado"} com sucesso!`,
       );
+
       setEditingId(null);
       setShowModal(false);
       setForm(INITIAL_FORM);
     } catch (error) {
-      console.error("Erro ao processar o lançamento:", error);
-      return;
+      console.error("Erro ao salvar:", error);
     }
+  };
+
+  const deleteLancamento = async (id) => {
+    const confirm = window.confirm("Deseja excluir este lançamento?");
+    if (!confirm) return;
+
+    const { error } = await supabase.from("lancamentos").delete().eq("id", id);
+
+    if (error) return console.error(error);
+
+    await loadLancamentos();
+    showToast("Lançamento excluído");
   };
 
   const updateLancamento = (id, field, value) => {
@@ -143,16 +168,9 @@ export default function App() {
     );
   };
 
-  const deleteLancamento = (id) => {
-    setLancamentos((prev) => prev.filter((l) => l.id !== id));
-  };
-
   const showToast = (message, type = "success") => {
     setToast({ message, type });
-
-    setTimeout(() => {
-      setToast(null);
-    }, 2500);
+    setTimeout(() => setToast(null), 2500);
   };
 
   const processData = useMemo(() => {
@@ -185,6 +203,7 @@ export default function App() {
       Object.values(obj)
         .flat()
         .reduce((a, b) => a + b, 0);
+
     return {
       entradas: sum(processData.entradas),
       saidas: sum(processData.saidas),
@@ -192,17 +211,11 @@ export default function App() {
     };
   }, [processData]);
 
-  if (!authenticated) {
+  if (!user) {
     return isLogin ? (
-      <LoginPage
-        onLogin={handleLogin}
-        onSwitchToSignup={() => setIsLogin(false)}
-      />
+      <LoginPage onSwitchToSignup={() => setIsLogin(false)} />
     ) : (
-      <SignupPage
-        onLogin={handleLogin}
-        onSwitchToLogin={() => setIsLogin(true)}
-      />
+      <SignupPage onSwitchToLogin={() => setIsLogin(true)} />
     );
   }
 

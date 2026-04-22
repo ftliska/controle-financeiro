@@ -3,7 +3,7 @@ import { supabase } from "../services/supabase";
 import { Mail, Lock, Wallet, ArrowRight, Eye, EyeOff } from "lucide-react";
 import { motion } from "framer-motion";
 
-export default function LoginPage({ onLogin, onSwitchToSignup }) {
+export default function LoginPage({ onSwitchToSignup }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -27,7 +27,7 @@ export default function LoginPage({ onLogin, onSwitchToSignup }) {
     setError("");
     setLoading(true);
 
-    const { data, error } = await supabase.auth.signInWithPassword({
+    const { error } = await supabase.auth.signInWithPassword({
       email,
       password,
     });
@@ -39,7 +39,6 @@ export default function LoginPage({ onLogin, onSwitchToSignup }) {
       setError(error.message);
       return;
     }
-    onLogin(data.user.email);
   };
 
   return (
