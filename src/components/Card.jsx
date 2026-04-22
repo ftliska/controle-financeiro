@@ -1,4 +1,4 @@
-import { calcVariation, getBehavior, formatBRL } from "../Utils";
+import { calcVariation, getBehavior, formatBRL, getMessage } from "../Utils";
 import { ChevronUp, ChevronDown } from "lucide-react";
 import MiniChart from "./Minichart";
 
@@ -11,6 +11,7 @@ export default function Card({
   dataset,
   type,
   datasetPrev,
+  year,
 }) {
   const variation = calcVariation(value, prevValue);
   const { isGood } = getBehavior(type, variation);
@@ -47,21 +48,26 @@ export default function Card({
           }`}
         >
           <Icon size={14} />
-          {Math.abs(variation).toFixed(1)}%
+          {Math.abs(variation).toFixed(2).replace(".", ",")}%
         </div>
 
-        <span className="text-xs text-zinc-500">
-          vs ano anterior ({formatBRL(prevValue)})
-        </span>
+        <span className="text-xs text-zinc-400">vs {year - 1}</span>
       </div>
 
       {/* TEXTO */}
-      {/* <p className={`text-xs ${isGood ? "text-emerald-500" : "text-red-400"} mt-2`}>
+      <p
+        className={`text-xs ${isGood ? "text-emerald-700" : "text-red-400"} mt-2`}
+      >
         {getMessage(type, variation)}
-      </p> */}
+      </p>
 
       {/* MINI GRÁFICO */}
-      <MiniChart data={dataset} datasetPrev={datasetPrev} color={color} type={type} />
+      <MiniChart
+        data={dataset}
+        datasetPrev={datasetPrev}
+        color={color}
+        type={type}
+      />
     </div>
   );
 }

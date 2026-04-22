@@ -76,6 +76,7 @@ export default function CardsHome({
           prevValue={summaryPrevYear.entradas}
           dataset={entradasMes}
           datasetPrev={entradasMesPrev}
+          year={year}
           color="#00ad6e"
           type="entradas"
           icon={<CircleArrowUp color="#00ad6e" size={28} />}
@@ -87,6 +88,7 @@ export default function CardsHome({
           prevValue={summaryPrevYear.saidas}
           dataset={saidasMes}
           datasetPrev={saidasMesPrev}
+          year={year}
           color="#f05a5a"
           type="saidas"
           icon={<CircleArrowDown color="#f05a5a" size={28} />}
@@ -98,6 +100,7 @@ export default function CardsHome({
           prevValue={summaryPrevYear.economias}
           dataset={economiasMes}
           datasetPrev={economiasMesPrev}
+          year={year}
           color="#60a5fa"
           type="economias"
           icon={<PiggyBank color="#60a5fa" size={28} />}
@@ -113,6 +116,7 @@ export default function CardsHome({
           datasetPrev={entradasMesPrev.map(
             (v, i) => v - saidasMesPrev[i] - economiasMesPrev[i],
           )}
+          year={year}
           color="#fa8415"
           type="saldo"
           icon={<HandCoins color="#fa8415" size={28} />}

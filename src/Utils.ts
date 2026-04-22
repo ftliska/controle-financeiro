@@ -111,7 +111,7 @@ export const getIcon = (descricao, tipo) => {
 };
 
 export const getMessage = (type, value) => {
-  const abs = Math.abs(value).toFixed(1);
+  const abs = Math.abs(value).toFixed(2).replace(".", ",");
 
   if (type === "entradas") {
     return value >= 0
@@ -127,8 +127,8 @@ export const getMessage = (type, value) => {
 
   if (type === "economias") {
     return value >= 0
-      ? `Você guardou ${abs}% mais`
-      : `Você guardou ${abs}% menos`;
+      ? `Você guardou ${abs}% a mais`
+      : `Você guardou ${abs}% a menos`;
   }
 
   if (type === "saldo") {
@@ -147,13 +147,13 @@ export const getBehavior = (type, value) => {
   // define se positivo é bom ou ruim
   const isPositive = value >= 0;
 
-  if (type === "entradas") {
+  if (type === "entradas" || type === "saldo") {
     return {
       isGood: isPositive,
     };
   }
 
-  if (type === "saidas" || type === "saldo") {
+  if (type === "saidas") {
     return {
       isGood: !isPositive, // gastar mais é ruim
     };
