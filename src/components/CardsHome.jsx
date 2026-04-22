@@ -20,6 +20,7 @@ export default function CardsHome({
   datasetEntradas,
   datasetSaidas,
   datasetEconomias,
+  processDataPrevYear,
 }) {
   const currentYear = new Date().getFullYear();
   const years = Array.from({ length: 5 }, (_, i) => currentYear - 2 + i);
@@ -38,6 +39,10 @@ export default function CardsHome({
   const entradasMes = getMonthTotals(datasetEntradas);
   const saidasMes = getMonthTotals(datasetSaidas);
   const economiasMes = getMonthTotals(datasetEconomias);
+
+  const entradasMesPrev = getMonthTotals(processDataPrevYear.entradas);
+  const saidasMesPrev = getMonthTotals(processDataPrevYear.saidas);
+  const economiasMesPrev = getMonthTotals(processDataPrevYear.economias);
 
   const saldoAtual = summary.entradas - summary.saidas - summary.economias;
 
@@ -70,6 +75,7 @@ export default function CardsHome({
           value={summary.entradas}
           prevValue={summaryPrevYear.entradas}
           dataset={entradasMes}
+          datasetPrev={entradasMesPrev}
           color="#00ad6e"
           type="entradas"
           icon={<CircleArrowUp color="#00ad6e" size={28} />}
@@ -80,6 +86,7 @@ export default function CardsHome({
           value={summary.saidas}
           prevValue={summaryPrevYear.saidas}
           dataset={saidasMes}
+          datasetPrev={saidasMesPrev}
           color="#f05a5a"
           type="saidas"
           icon={<CircleArrowDown color="#f05a5a" size={28} />}
@@ -90,9 +97,10 @@ export default function CardsHome({
           value={summary.economias}
           prevValue={summaryPrevYear.economias}
           dataset={economiasMes}
+          datasetPrev={economiasMesPrev}
           color="#60a5fa"
           type="economias"
-          icon={<PiggyBank color="#60a5fa" size={28}/>}
+          icon={<PiggyBank color="#60a5fa" size={28} />}
         />
 
         <Card
@@ -102,9 +110,12 @@ export default function CardsHome({
           dataset={entradasMes.map(
             (v, i) => v - saidasMes[i] - economiasMes[i],
           )}
+          datasetPrev={entradasMesPrev.map(
+            (v, i) => v - saidasMesPrev[i] - economiasMesPrev[i],
+          )}
           color="#fa8415"
           type="saldo"
-          icon={<HandCoins color="#fa8415" size={28}/>}
+          icon={<HandCoins color="#fa8415" size={28} />}
         />
       </div>
     </>

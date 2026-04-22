@@ -1,8 +1,9 @@
 import { useId, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { MONTHS } from "../Constants";
+import { formatBRL, getBehavior } from "../Utils";
 
-const MiniChart = ({ data, color }) => {
+const MiniChart = ({ data, color, datasetPrev, type }) => {
   const id = useId();
   const [hoverIndex, setHoverIndex] = useState(null);
 
@@ -54,6 +55,20 @@ const MiniChart = ({ data, color }) => {
 
   const hoveredPoint = hoverIndex !== null ? points[hoverIndex] : null;
 
+  const prevValue =
+    datasetPrev && hoverIndex !== null
+      ? Number(datasetPrev[hoverIndex] || 0)
+      : 0;
+
+  const currentValue = hoveredPoint?.value || 0;
+
+  const variation =
+    prevValue === 0
+      ? 0
+      : ((currentValue - prevValue / 100) / (prevValue / 100)) * 100;
+
+  const { isGood } = getBehavior(type, variation);
+
   return (
     <div className="mt-5 relative select-none">
       <svg
@@ -63,7 +78,7 @@ const MiniChart = ({ data, color }) => {
       >
         <defs>
           <linearGradient id={`line-${id}`} x1="0" y1="0" x2="1" y2="0">
-            <stop offset="100%" stopColor={color} stopOpacity="0.8" />
+            <stop offset="100%" stopColor={color} stopOpacity="0.7" />
             <stop offset="100%" stopColor={color} stopOpacity="1" />
           </linearGradient>
 
@@ -118,19 +133,6 @@ const MiniChart = ({ data, color }) => {
           />
         ))}
 
-        {/* LINHA VERTICAL (crosshair) */}
-        {/* {hoveredPoint && (
-          <line
-            x1={hoveredPoint.x}
-            x2={hoveredPoint.x}
-            y1={paddingY}
-            y2={height - paddingY}
-            stroke={color}
-            strokeDasharray="4 4"
-            opacity="0.6"
-          />
-        )} */}
-
         {/* PONTOS */}
         {points.map((p, i) => (
           <g key={i}>
@@ -162,16 +164,29 @@ const MiniChart = ({ data, color }) => {
               top: hoveredPoint.y - 10,
             }}
           >
+            {/* MÊS */}
             <div className="text-zinc-400 text-[10px]">
               {MONTHS[hoverIndex]}
             </div>
 
+            {/* VALOR ATUAL */}
             <div className="font-semibold" style={{ color }}>
-              {hoveredPoint.value.toLocaleString("pt-BR", {
-                style: "currency",
-                currency: "BRL",
-              })}
+              {formatBRL(currentValue * 100)}
             </div>
+
+            {/* VALOR ANTERIOR */}
+            {datasetPrev && (
+              <div
+                className={`text-[10px] mt-1 flex items-center gap-1 ${
+                  isGood ? "text-emerald-400" : "text-red-400"
+                }`}
+              >
+                {variation >= 0 ? "▲" : "▼"} {Math.abs(variation).toFixed(1)}%
+                <span className="text-zinc-500 ml-1">
+                  vs {MONTHS[hoverIndex]} ({formatBRL(prevValue)})
+                </span>
+              </div>
+            )}
           </motion.div>
         )}
       </AnimatePresence>

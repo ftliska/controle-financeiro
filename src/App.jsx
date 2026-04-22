@@ -326,6 +326,7 @@ export default function App() {
           getIcon={getIcon}
           loading={loading}
           summaryPrevYear={summaryPrevYear}
+          processDataPrevYear={processDataPrevYear}
         />
       )}
 

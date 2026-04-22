@@ -12,6 +12,7 @@ export default function HomePage({
   getIcon,
   loading,
   summaryPrevYear,
+  processDataPrevYear,
 }) {
   return (
     <div className="mx-auto px-6 py-6">
@@ -35,6 +36,7 @@ export default function HomePage({
               datasetEntradas={processData.entradas}
               datasetSaidas={processData.saidas}
               datasetEconomias={processData.economias}
+              processDataPrevYear={processDataPrevYear}
             />
           )}
         </motion.div>

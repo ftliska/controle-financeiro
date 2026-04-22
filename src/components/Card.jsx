@@ -10,6 +10,7 @@ export default function Card({
   color,
   dataset,
   type,
+  datasetPrev,
 }) {
   const variation = calcVariation(value, prevValue);
   const { isGood } = getBehavior(type, variation);
@@ -60,7 +61,7 @@ export default function Card({
       </p> */}
 
       {/* MINI GRÁFICO */}
-      <MiniChart data={dataset} color={color} />
+      <MiniChart data={dataset} datasetPrev={datasetPrev} color={color} type={type} />
     </div>
   );
 }
