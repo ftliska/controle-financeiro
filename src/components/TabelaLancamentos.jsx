@@ -174,7 +174,9 @@ export default function TabelaLancamentos({
                     onChange={(e) =>
                       updateLancamento(l.id, "status", e.target.value)
                     }
-                    className="w-full whitespace-nowrap bg-zinc-900 border border-zinc-700 rounded-lg px-2 py-1 focus:ring-2 focus:ring-emerald-500"
+                    className={`w-full whitespace-nowrap bg-zinc-900 border border-zinc-700 rounded-lg px-2 py-1 focus:ring-2 focus:ring-emerald-500 
+                      ${l._updating ? "opacity-50 cursor-wait" : ""}`}
+                    disabled={l._updating}
                   >
                     <option>Previsto</option>
                     <option>Pago</option>

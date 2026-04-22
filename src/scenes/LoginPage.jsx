@@ -35,8 +35,7 @@ export default function LoginPage({ onSwitchToSignup }) {
     setLoading(false);
 
     if (error) {
-      console.log(error);
-      setError(error.message);
+      setError(error.code === 'invalid_credentials' ? "Usuário e/ou senha inválidos." : "Ocorreu um erro. Tente novamente.");
       return;
     }
   };

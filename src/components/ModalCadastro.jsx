@@ -1,4 +1,4 @@
-import { CADASTROS, INITIAL_FORM } from "../Constants";
+import { INITIAL_FORM, CADASTROS } from "../Constants";
 
 export default function ModalCadastro({
   form,
@@ -6,7 +6,11 @@ export default function ModalCadastro({
   editingId,
   setShowModal,
   handleConfirm,
+  saving,
 }) {
+  const isDisabled =
+    saving || !form.descricao || !form.valor || !form.dataVencimento;
+
   return (
     <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 animate-fadeIn">
       <div className="bg-zinc-900 w-full max-w-lg rounded-2xl border border-zinc-800 shadow-2xl p-6 animate-scaleIn">
@@ -19,7 +23,9 @@ export default function ModalCadastro({
         </div>
 
         {/* FORM */}
-        <div className="space-y-4">
+        <div
+          className={`space-y-4 ${saving ? "opacity-70 pointer-events-none" : ""}`}
+        >
           {/* Data */}
           <div>
             <label className="label">Data de vencimento</label>
@@ -56,17 +62,15 @@ export default function ModalCadastro({
             <input
               value={
                 form.valor
-                  ? `R$ ${(Number(form.valor) / 100).toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
+                  ? `R$ ${(Number(form.valor) / 100).toLocaleString("pt-BR", {
+                      minimumFractionDigits: 2,
+                      maximumFractionDigits: 2,
+                    })}`
                   : ""
               }
               onChange={(e) => {
                 const numeric = e.target.value.replace(/\D/g, "");
                 setForm({ ...form, valor: numeric });
-              }}
-              onBlur={() => {
-                if (!form.valor) {
-                  setForm({ ...form, valor: "" });
-                }
               }}
               className="input"
               placeholder="R$ 0,00"
@@ -100,12 +104,11 @@ export default function ModalCadastro({
             </label>
 
             <div
-              className={`transition-all duration-300 ease-out ${
+              className={`transition-all duration-300 ${
                 form.parcelado
-                  ? "max-h-24 opacity-100 mt-3 overflow-visible"
+                  ? "max-h-24 opacity-100 mt-3"
                   : "max-h-0 opacity-0 mt-0 overflow-hidden"
               }`}
-              aria-hidden={!form.parcelado}
             >
               <div className="flex gap-2">
                 <input
@@ -114,12 +117,10 @@ export default function ModalCadastro({
                   onChange={(e) =>
                     setForm({
                       ...form,
-                      parcelasPagas: e.target.value
-                        .replace(/\D/g, "")
-                        .slice(0, 2),
+                      parcelasPagas: e.target.value.replace(/\D/g, ""),
                     })
                   }
-                  className="input text-center !w-20 flex-shrink-0"
+                  className="input text-center !w-20"
                 />
                 <input
                   placeholder="Total"
@@ -127,12 +128,10 @@ export default function ModalCadastro({
                   onChange={(e) =>
                     setForm({
                       ...form,
-                      parcelasTotais: e.target.value
-                        .replace(/\D/g, "")
-                        .slice(0, 2),
+                      parcelasTotais: e.target.value.replace(/\D/g, ""),
                     })
                   }
-                  className="input text-center !w-20 flex-shrink-0"
+                  className="input text-center !w-20"
                 />
               </div>
             </div>
@@ -153,20 +152,32 @@ export default function ModalCadastro({
         {/* FOOTER */}
         <div className="flex justify-end gap-3 mt-6">
           <button
+            disabled={saving}
             onClick={() => {
               setShowModal(false);
               setForm(INITIAL_FORM);
             }}
-            className="px-4 py-2 rounded-xl bg-red-500 hover:bg-red-600 transition shadow-lg"
+            className="px-4 py-2 rounded-xl bg-red-500 hover:bg-red-600 transition shadow-lg disabled:opacity-50"
           >
             Cancelar
           </button>
 
           <button
             onClick={handleConfirm}
-            className="px-4 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-600 transition shadow-lg"
+            disabled={isDisabled}
+            className="
+              px-4 py-2 rounded-xl
+              bg-emerald-500 hover:bg-emerald-600
+              transition shadow-lg
+              flex items-center gap-2
+              disabled:opacity-50 disabled:cursor-not-allowed
+            "
           >
-            Confirmar
+            {saving ? (
+              <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+            ) : (
+              <>Confirmar</>
+            )}
           </button>
         </div>
       </div>

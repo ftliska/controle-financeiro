@@ -1,5 +1,5 @@
 import { MONTHS } from "../Constants";
-import { formatBRL } from "../Utils";
+import { formatBRL, getVariation } from "../Utils";
 import {
   ArrowUpRight,
   ArrowDownRight,
@@ -9,8 +9,27 @@ import {
   DollarSign,
 } from "lucide-react";
 
+const Variation = ({ value }) => {
+  if (value === null) return null;
+
+  const isPositive = value >= 0;
+
+  return (
+    <div
+      className={`flex items-center gap-1 text-xs mt-1 ${
+        isPositive ? "text-emerald-400" : "text-red-400"
+      }`}
+    >
+      {isPositive ? <TrendingUp size={14} /> : <TrendingDown size={14} />}
+
+      <span>{Math.abs(value).toFixed(1)}%</span>
+    </div>
+  );
+};
+
 export default function CardsHome({
   summary,
+  summaryPrevYear,
   setYear,
   year,
   datasetEntradas,
@@ -36,6 +55,27 @@ export default function CardsHome({
 
   const monthTotalsEconomias = getMonthTotals(datasetEconomias);
 
+  const variationEntradas = getVariation(
+    summary.entradas,
+    summaryPrevYear.entradas,
+  );
+
+  const variationSaidas = getVariation(summary.saidas, summaryPrevYear?.saidas);
+
+  const variationEconomias = getVariation(
+    summary.economias,
+    summaryPrevYear?.economias,
+  );
+
+  const saldo = summary.entradas - summary.saidas - summary.economias;
+
+  const saldoPrev =
+    (summaryPrevYear?.entradas || 0) -
+    (summaryPrevYear?.saidas || 0) -
+    (summaryPrevYear?.economias || 0);
+
+  const variationSaldo = getVariation(saldo, saldoPrev);
+
   return (
     <>
       <div className="flex justify-center items-center mb-6">
@@ -57,9 +97,12 @@ export default function CardsHome({
             <TrendingUp className="text-emerald-400" size={24} />
             Entradas
           </p>
+
           <p className="text-2xl font-semibold text-emerald-400 mt-2">
             {formatBRL(summary.entradas)}
           </p>
+
+          <Variation value={variationEntradas} />
         </div>
 
         <div className="bg-[#22242b] p-5 rounded-2xl shadow-lg border border-[#3d4047]">
@@ -70,6 +113,8 @@ export default function CardsHome({
           <p className="text-2xl font-semibold text-red-400 mt-2">
             {formatBRL(summary.saidas)}
           </p>
+
+          <Variation value={variationSaidas} />
         </div>
 
         <div className="bg-[#22242b] p-5 rounded-2xl shadow-lg border border-[#3d4047]">
@@ -80,6 +125,8 @@ export default function CardsHome({
           <p className="text-2xl font-semibold text-blue-400 mt-2">
             {formatBRL(summary.economias)}
           </p>
+
+          <Variation value={variationEconomias} />
         </div>
 
         <div className="bg-[#22242b] p-5 rounded-2xl shadow-lg border border-[#3d4047]">
@@ -90,6 +137,8 @@ export default function CardsHome({
           <p className="text-2xl font-semibold text-yellow-400 mt-2">
             {formatBRL(summary.entradas - summary.saidas - summary.economias)}
           </p>
+
+          <Variation value={variationSaldo} />
         </div>
       </div>
       <div className="grid grid-cols-12 gap-1.5 mb-6">

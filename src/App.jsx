@@ -19,7 +19,8 @@ export default function App() {
   const [page, setPage] = useState("home");
   const [user, setUser] = useState(null);
   const [isLogin, setIsLogin] = useState(true);
-
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
   const [year, setYear] = useState(() => {
     const saved = Number(localStorage.getItem("selectedYear"));
     const current = new Date().getFullYear();
@@ -59,6 +60,8 @@ export default function App() {
   const loadLancamentos = async () => {
     if (!user) return;
 
+    setLoading(true);
+
     const { data, error } = await supabase
       .from("lancamentos")
       .select("*")
@@ -67,6 +70,7 @@ export default function App() {
 
     if (error) {
       console.error(error);
+      setLoading(false);
       return;
     }
 
@@ -83,6 +87,8 @@ export default function App() {
         obs: l.obs,
       })),
     );
+
+    setLoading(false);
   };
 
   useEffect(() => {
@@ -95,6 +101,8 @@ export default function App() {
 
   const handleConfirm = async () => {
     try {
+      setSaving(true);
+
       const cadastro = CADASTROS.find((c) => c.descricao === form.descricao);
       if (!cadastro) return;
 
@@ -115,7 +123,7 @@ export default function App() {
           })
           .eq("id", editingId);
 
-        if (error) return console.error(error);
+        if (error) throw error;
       } else {
         const novos = createLancamentos(form, cadastro, valor, hoje).map(
           (l) => ({
@@ -132,8 +140,7 @@ export default function App() {
         );
 
         const { error } = await supabase.from("lancamentos").insert(novos);
-
-        if (error) return console.error(error);
+        if (error) throw error;
       }
 
       await loadLancamentos();
@@ -146,7 +153,10 @@ export default function App() {
       setShowModal(false);
       setForm(INITIAL_FORM);
     } catch (error) {
-      console.error("Erro ao salvar:", error);
+      console.error(error);
+      showToast("Erro ao salvar", "error");
+    } finally {
+      setSaving(false);
     }
   };
 
@@ -162,10 +172,50 @@ export default function App() {
     showToast("Lançamento excluído");
   };
 
-  const updateLancamento = (id, field, value) => {
+  const updateLancamento = async (id, field, value) => {
+    // 1. Atualiza UI imediatamente (otimista)
     setLancamentos((prev) =>
-      prev.map((item) => (item.id === id ? { ...item, [field]: value } : item)),
+      prev.map((l) =>
+        l.id === id ? { ...l, [field]: value, _updating: true } : l,
+      ),
     );
+
+    // 2. Persiste no backend
+    const { error } = await supabase
+      .from("lancamentos")
+      .update({
+        [mapField(field)]: value,
+      })
+      .eq("id", id);
+
+    if (error) {
+      console.error(error);
+      showToast("Erro ao atualizar", "error");
+
+      // rollback
+      await loadLancamentos();
+      return;
+    }
+
+    // 3. Remove flag de loading
+    setLancamentos((prev) =>
+      prev.map((l) => (l.id === id ? { ...l, _updating: false } : l)),
+    );
+  };
+
+  const mapField = (field) => {
+    const map = {
+      dataLancamento: "data_lancamento",
+      dataVencimento: "data_vencimento",
+      descricao: "descricao",
+      categoria: "categoria",
+      tipo: "tipo",
+      valor: "valor",
+      status: "status",
+      obs: "obs",
+    };
+
+    return map[field] || field;
   };
 
   const showToast = (message, type = "success") => {
@@ -198,6 +248,31 @@ export default function App() {
     return data;
   }, [lancamentos, year]);
 
+  const processDataPrevYear = useMemo(() => {
+    const data = { entradas: {}, saidas: {}, economias: {} };
+
+    lancamentos.forEach((l) => {
+      if (!l.dataVencimento || !l.valor) return;
+
+      const date = parseDateLocal(l.dataVencimento);
+      if (!date || date.getFullYear() !== year - 1) return;
+
+      const monthIndex = date.getMonth();
+      const categoria = l.descricao || "Sem categoria";
+      const valor = Number(l.valor);
+
+      let target;
+      if (l.tipo === "Receita") target = data.entradas;
+      else if (l.tipo === "Despesa") target = data.saidas;
+      else target = data.economias;
+
+      if (!target[categoria]) target[categoria] = Array(12).fill(0);
+      target[categoria][monthIndex] += valor;
+    });
+
+    return data;
+  }, [lancamentos, year]);
+
   const summary = useMemo(() => {
     const sum = (obj) =>
       Object.values(obj)
@@ -210,6 +285,19 @@ export default function App() {
       economias: sum(processData.economias),
     };
   }, [processData]);
+
+  const summaryPrevYear = useMemo(() => {
+    const sum = (obj) =>
+      Object.values(obj)
+        .flat()
+        .reduce((a, b) => a + b, 0);
+
+    return {
+      entradas: sum(processDataPrevYear.entradas),
+      saidas: sum(processDataPrevYear.saidas),
+      economias: sum(processDataPrevYear.economias),
+    };
+  }, [processDataPrevYear]);
 
   if (!user) {
     return isLogin ? (
@@ -235,6 +323,8 @@ export default function App() {
           year={year}
           setYear={setYear}
           getIcon={getIcon}
+          loading={loading}
+          summaryPrevYear={summaryPrevYear}
         />
       )}
 
@@ -253,6 +343,7 @@ export default function App() {
           hidePaid={hidePaid}
           setHidePaid={setHidePaid}
           showToast={showToast}
+          saving={saving}
         />
       )}
 

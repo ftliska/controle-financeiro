@@ -109,3 +109,9 @@ export const getIcon = (descricao, tipo) => {
 
   return ICONS_BY_TYPE[tipo];
 };
+
+export const getVariation = (current, prev) => {
+  if (!prev || prev === 0) return null;
+
+  return ((current - prev) / prev) * 100;
+};

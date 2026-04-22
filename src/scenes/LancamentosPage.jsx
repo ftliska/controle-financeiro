@@ -21,6 +21,7 @@ export default function LancamentosPage({
   hidePaid,
   setHidePaid,
   showToast,
+  saving,
 }) {
   const [isSorted, setIsSorted] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(null);
@@ -63,6 +64,7 @@ export default function LancamentosPage({
               editingId={editingId}
               setShowModal={setShowModal}
               handleConfirm={handleConfirm}
+              saving={saving}
             />
           )}
 
