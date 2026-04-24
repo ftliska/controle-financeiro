@@ -9,7 +9,6 @@ export default function HomePage({
   processData,
   year,
   setYear,
-  getIcon,
   loading,
   summaryPrevYear,
   processDataPrevYear,
@@ -57,7 +56,6 @@ export default function HomePage({
           >
             <TabelaHome
               dataset={processData.entradas}
-              getIcon={getIcon}
               color="text-emerald-400"
               titulo="Entradas"
               tipo="Receita"
@@ -72,7 +70,6 @@ export default function HomePage({
           >
             <TabelaHome
               dataset={processData.saidas}
-              getIcon={getIcon}
               color="text-red-400"
               titulo="Saídas"
               tipo="Despesa"
@@ -87,7 +84,6 @@ export default function HomePage({
           >
             <TabelaHome
               dataset={processData.economias}
-              getIcon={getIcon}
               color="text-blue-400"
               titulo="Economias"
               tipo="Investimento"

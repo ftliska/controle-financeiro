@@ -1,6 +1,7 @@
 import { Home, List, Settings, Wallet, User, LogOut } from "lucide-react";
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
+import icon02 from "../../public/icon02.png";
 
 export default function NavbarHeader({ page, setPage, user, onLogout }) {
   const [hovered, setHovered] = useState(null);
@@ -16,7 +17,6 @@ export default function NavbarHeader({ page, setPage, user, onLogout }) {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  // 🔥 Persistência da página ativa
   useEffect(() => {
     localStorage.setItem("activePage", page);
   }, [page]);
@@ -47,7 +47,7 @@ export default function NavbarHeader({ page, setPage, user, onLogout }) {
     >
       {/* LEFT */}
       <div className="flex gap-4 items-center">
-        <Wallet className="text-emerald-400" />
+        <img src={icon02} alt="Logo" className="w-9 h-9" />
 
         <h1
           className={`font-semibold tracking-wide transition-all duration-300 ${

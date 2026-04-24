@@ -1,8 +1,8 @@
 import { MONTHS } from "../Constants";
-import { formatBRL } from "../Utils";
+import { formatBRL, getIcon } from "../Utils";
 import { motion } from "framer-motion";
 
-export default function TabelaHome({ dataset, getIcon, tipo, year }) {
+export default function TabelaHome({ dataset, tipo, year }) {
   const categorias = Object.keys(dataset).sort((a, b) =>
     a.localeCompare(b, "pt-BR"),
   );

@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 import { motion } from "framer-motion";
 import { supabase } from "../services/supabase";
+import icon02 from "../../public/icon02.png";
 
 /* ---------- HELPERS ---------- */
 
@@ -64,8 +65,8 @@ export default function SignupPage({ onSwitchToLogin }) {
   };
 
   const inputStyle = (field) => `
-    w-full rounded-2xl 
-    border 
+    w-full rounded-2xl
+    border
     bg-[#14171F]/80
     px-12 py-3 
     text-white 
@@ -170,8 +171,8 @@ export default function SignupPage({ onSwitchToLogin }) {
         <div className="rounded-[2rem] border border-white/5 bg-[#1A1D26]/80 backdrop-blur-xl p-8 shadow-[0_20px_60px_rgba(0,0,0,0.45)]">
           {/* HEADER */}
           <div className="flex flex-col items-center gap-4 mb-8">
-            <div className="flex h-14 w-14 items-center justify-center rounded-full bg-emerald-400/10 text-emerald-400 shadow-inner">
-              <Wallet size={22} />
+            <div className="flex w-24 h-24 items-center justify-center rounded-full bg-[#14171F]/80 shadow-inner">
+              <img src={icon02} alt="Logo" className="w-20 h-20" />
             </div>
 
             <div className="text-center">
@@ -187,23 +188,21 @@ export default function SignupPage({ onSwitchToLogin }) {
           {/* FORM */}
           <form onSubmit={handleSubmit} className="space-y-4">
             {/* NOME */}
-            <div className="grid grid-cols-1 gap-3">
-              <div className="relative group">
-                <User
-                  className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-500"
-                  size={16}
-                />
-                <input
-                  ref={refs.nome}
-                  placeholder="Nome Completo"
-                  value={nome}
-                  onChange={(e) => {
-                    setNome(e.target.value);
-                    validateField("nome", e.target.value);
-                  }}
-                  className={inputStyle("nome")}
-                />
-              </div>
+            <div className="relative group">
+              <User
+                className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-500"
+                size={16}
+              />
+              <input
+                ref={refs.nome}
+                placeholder="Nome Completo"
+                value={nome}
+                onChange={(e) => {
+                  setNome(e.target.value);
+                  validateField("nome", e.target.value);
+                }}
+                className={inputStyle("nome")}
+              />
             </div>
 
             {/* TELEFONE */}

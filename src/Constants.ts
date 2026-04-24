@@ -188,6 +188,12 @@ export const CADASTROS = [
     tipo: "Despesa",
     id: crypto.randomUUID(),
   },
+  {
+    descricao: "Casamento",
+    categoria: "Contas",
+    tipo: "Despesa",
+    id: crypto.randomUUID(),
+  },
 ];
 
 export const ICONS_BY_DESCRICAO = {

@@ -6,12 +6,7 @@ import CadastroPage from "./scenes/CadastroPage";
 import LoginPage from "./scenes/LoginPage";
 import SignupPage from "./scenes/SignupPage";
 import { CADASTROS, INITIAL_FORM } from "./Constants";
-import {
-  formatDateLocal,
-  parseDateLocal,
-  createLancamentos,
-  getIcon,
-} from "./Utils";
+import { formatDateLocal, parseDateLocal, createLancamentos } from "./Utils";
 import NavbarHeader from "./components/NavbarHeader";
 import ToastConfirmacao from "./components/ToastConfirmacao";
 
@@ -323,7 +318,6 @@ export default function App() {
           processData={processData}
           year={year}
           setYear={setYear}
-          getIcon={getIcon}
           loading={loading}
           summaryPrevYear={summaryPrevYear}
           processDataPrevYear={processDataPrevYear}

@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { supabase } from "../services/supabase";
+import icon02 from "../../public/icon02.png";
 import { Mail, Lock, Wallet, ArrowRight, Eye, EyeOff } from "lucide-react";
 import { motion } from "framer-motion";
 
@@ -55,8 +56,8 @@ export default function LoginPage({ onSwitchToSignup }) {
         <div className="rounded-[2rem] border border-white/5 bg-[#1A1D26]/80 backdrop-blur-xl p-8 shadow-[0_20px_60px_rgba(0,0,0,0.45)]">
           {/* HEADER */}
           <div className="flex flex-col items-center gap-4 mb-8">
-            <div className="flex h-14 w-14 items-center justify-center rounded-full bg-emerald-400/10 text-emerald-400 shadow-inner">
-              <Wallet size={22} />
+            <div className="flex w-24 h-24 items-center justify-center rounded-full bg-[#14171F]/80 shadow-inner">
+              <img src={icon02} alt="Logo" className="w-20 h-20" />
             </div>
 
             <div className="text-center">
