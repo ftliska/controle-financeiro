@@ -1,16 +1,12 @@
-import { MONTHS } from "../Constants";
 import {
-  TrendingUp,
-  TrendingDown,
   PiggyBank,
-  DollarSign,
-  ArrowUpRight,
-  ArrowDownRight,
   CircleArrowUp,
   CircleArrowDown,
   HandCoins,
 } from "lucide-react";
 import Card from "./Card";
+import { getMonthTotals, getYears } from "../Utils";
+import { MONTHS } from "../Constants";
 
 export default function CardsHome({
   summary,
@@ -22,28 +18,6 @@ export default function CardsHome({
   datasetEconomias,
   processDataPrevYear,
 }) {
-  const currentYear = new Date().getFullYear();
-  const years = Array.from({ length: 5 }, (_, i) => currentYear - 2 + i);
-
-  const getMonthTotals = (dataset) => {
-    const categorias = Object.keys(dataset);
-
-    return MONTHS.map((_, monthIndex) =>
-      categorias.reduce(
-        (sum, cat) => sum + (dataset[cat]?.[monthIndex] || 0),
-        0,
-      ),
-    );
-  };
-
-  const entradasMes = getMonthTotals(datasetEntradas);
-  const saidasMes = getMonthTotals(datasetSaidas);
-  const economiasMes = getMonthTotals(datasetEconomias);
-
-  const entradasMesPrev = getMonthTotals(processDataPrevYear.entradas);
-  const saidasMesPrev = getMonthTotals(processDataPrevYear.saidas);
-  const economiasMesPrev = getMonthTotals(processDataPrevYear.economias);
-
   const saldoAtual = summary.entradas - summary.saidas - summary.economias;
 
   const saldoPrev =
@@ -60,7 +34,7 @@ export default function CardsHome({
           onChange={(e) => setYear(Number(e.target.value))}
           className="bg-zinc-900 border border-zinc-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
         >
-          {years.map((y) => (
+          {getYears().map((y) => (
             <option key={y} value={y}>
               {y}
             </option>
@@ -74,8 +48,8 @@ export default function CardsHome({
           title="Entradas"
           value={summary.entradas}
           prevValue={summaryPrevYear.entradas}
-          dataset={entradasMes}
-          datasetPrev={entradasMesPrev}
+          dataset={getMonthTotals(datasetEntradas)}
+          datasetPrev={getMonthTotals(processDataPrevYear.entradas)}
           year={year}
           color="#00ad6e"
           type="entradas"
@@ -86,8 +60,8 @@ export default function CardsHome({
           title="Saídas"
           value={summary.saidas}
           prevValue={summaryPrevYear.saidas}
-          dataset={saidasMes}
-          datasetPrev={saidasMesPrev}
+          dataset={getMonthTotals(datasetSaidas)}
+          datasetPrev={getMonthTotals(processDataPrevYear.saidas)}
           year={year}
           color="#f05a5a"
           type="saidas"
@@ -98,8 +72,8 @@ export default function CardsHome({
           title="Economias"
           value={summary.economias}
           prevValue={summaryPrevYear.economias}
-          dataset={economiasMes}
-          datasetPrev={economiasMesPrev}
+          dataset={getMonthTotals(datasetEconomias)}
+          datasetPrev={getMonthTotals(processDataPrevYear.economias)}
           year={year}
           color="#60a5fa"
           type="economias"
@@ -110,11 +84,17 @@ export default function CardsHome({
           title="Saldo"
           value={saldoAtual}
           prevValue={saldoPrev}
-          dataset={entradasMes.map(
-            (v, i) => v - saidasMes[i] - economiasMes[i],
+          dataset={getMonthTotals(datasetEntradas).map(
+            (v, i) =>
+              v -
+              getMonthTotals(datasetSaidas)[i] -
+              getMonthTotals(datasetEconomias)[i],
           )}
-          datasetPrev={entradasMesPrev.map(
-            (v, i) => v - saidasMesPrev[i] - economiasMesPrev[i],
+          datasetPrev={getMonthTotals(processDataPrevYear.entradas).map(
+            (v, i) =>
+              v -
+              getMonthTotals(processDataPrevYear.saidas)[i] -
+              getMonthTotals(processDataPrevYear.economias)[i],
           )}
           year={year}
           color="#fa8415"

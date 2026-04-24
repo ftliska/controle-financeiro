@@ -14,6 +14,8 @@ import {
   Landmark,
   BanknoteArrowUp,
   Gem,
+  List,
+  Settings,
 } from "lucide-react";
 
 export const MONTHS = [
@@ -230,3 +232,9 @@ export const INITIAL_FORM = {
   parcelasTotais: "",
   obs: "",
 };
+
+export const NAV_ITENS = [
+  { page: "home", icon: Home, label: "Home" },
+  { page: "lancamentos", icon: List, label: "Lançamentos" },
+  { page: "cadastro", icon: Settings, label: "Cadastro" },
+];

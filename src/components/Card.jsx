@@ -15,9 +15,7 @@ export default function Card({
 }) {
   const variation = calcVariation(value, prevValue);
   const { isGood } = getBehavior(type, variation);
-
   const isPositive = variation >= 0;
-
   const Icon = isPositive ? ChevronUp : ChevronDown;
 
   return (

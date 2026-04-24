@@ -2,12 +2,12 @@ import { Home, List, Settings, Wallet, User, LogOut } from "lucide-react";
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import icon02 from "../../public/icon02.png";
+import { NAV_ITENS } from "../Constants";
 
 export default function NavbarHeader({ page, setPage, user, onLogout }) {
   const [hovered, setHovered] = useState(null);
   const [scrolled, setScrolled] = useState(false);
 
-  // 🔥 Detecta scroll (shrink + sombra)
   useEffect(() => {
     const handleScroll = () => {
       setScrolled(window.scrollY > 10);
@@ -20,12 +20,6 @@ export default function NavbarHeader({ page, setPage, user, onLogout }) {
   useEffect(() => {
     localStorage.setItem("activePage", page);
   }, [page]);
-
-  const navItems = [
-    { page: "home", icon: Home, label: "Home" },
-    { page: "lancamentos", icon: List, label: "Lançamentos" },
-    { page: "cadastro", icon: Settings, label: "Cadastro" },
-  ];
 
   return (
     <motion.div
@@ -59,7 +53,7 @@ export default function NavbarHeader({ page, setPage, user, onLogout }) {
 
         {/* NAV */}
         <nav className="flex gap-6 ml-6 text-sm relative">
-          {navItems.map((item) => {
+          {NAV_ITENS.map((item) => {
             const Icon = item.icon;
             const isActive = page === item.page;
             const isHover = hovered === item.page;
@@ -89,7 +83,7 @@ export default function NavbarHeader({ page, setPage, user, onLogout }) {
                   {item.label}
                 </span>
 
-                {/* UNDERLINE PREMIUM */}
+                {/* UNDERLINE */}
                 {(isActive || isHover) && (
                   <motion.div
                     layoutId="underline"

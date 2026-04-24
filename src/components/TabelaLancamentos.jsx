@@ -1,6 +1,6 @@
 import { Pencil, X } from "lucide-react";
 import { CADASTROS } from "../Constants";
-import { formatDateLocal, formatBRL, parseBRL } from "../Utils";
+import { getRowStatus, formatBRL, parseBRL } from "../Utils";
 
 export default function TabelaLancamentos({
   updateLancamento,
@@ -12,19 +12,6 @@ export default function TabelaLancamentos({
   isSorted,
   setConfirmDelete,
 }) {
-  const getRowStatus = (l) => {
-    if (l.status === "Pago") return "normal";
-
-    const today = formatDateLocal(new Date());
-
-    if (!l.dataVencimento) return "normal";
-
-    if (l.dataVencimento < today) return "vencido";
-    if (l.dataVencimento === today) return "hoje";
-
-    return "normal";
-  };
-
   const processedLancamentos = [...lancamentos]
     .filter((l) => (hidePaid ? l.status !== "Pago" : true))
     .sort((a, b) => {

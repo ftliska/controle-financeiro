@@ -191,7 +191,7 @@ const MiniChart = ({ data, color, datasetPrev, type }) => {
         )}
       </AnimatePresence>
 
-      {/* MESES PERFEITAMENTE ALINHADOS */}
+      {/* MESES */}
       <div className="relative mt-2 h-4">
         {points.map((p, i) => (
           <span

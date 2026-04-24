@@ -1,4 +1,4 @@
-import { ICONS_BY_DESCRICAO, ICONS_BY_TYPE } from "./Constants";
+import { ICONS_BY_DESCRICAO, ICONS_BY_TYPE, MONTHS } from "./Constants";
 
 export const formatBRL = (value: number | string) => {
   const num = Number(value);
@@ -173,4 +173,30 @@ export const getBehavior = (type, value) => {
       isGood: isPositive, // guardar mais é bom
     };
   }
+};
+
+export const getRowStatus = (l) => {
+  if (l.status === "Pago") return "normal";
+
+  const today = formatDateLocal(new Date());
+
+  if (!l.dataVencimento) return "normal";
+
+  if (l.dataVencimento < today) return "vencido";
+  if (l.dataVencimento === today) return "hoje";
+
+  return "normal";
+};
+
+export const getMonthTotals = (dataset) => {
+  const categorias = Object.keys(dataset);
+
+  return MONTHS.map((_, monthIndex) =>
+    categorias.reduce((sum, cat) => sum + (dataset[cat]?.[monthIndex] || 0), 0),
+  );
+};
+
+export const getYears = () => {
+  const currentYear = new Date().getFullYear();
+  return Array.from({ length: 5 }, (_, i) => currentYear - 2 + i);
 };
