@@ -1,4 +1,4 @@
-import { Home, List, Settings, Wallet, User, LogOut } from "lucide-react";
+import { User, LogOut } from "lucide-react";
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import icon02 from "../../public/icon02.png";

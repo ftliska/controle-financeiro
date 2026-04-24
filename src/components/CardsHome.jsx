@@ -6,7 +6,6 @@ import {
 } from "lucide-react";
 import Card from "./Card";
 import { getMonthTotals, getYears } from "../Utils";
-import { MONTHS } from "../Constants";
 
 export default function CardsHome({
   summary,

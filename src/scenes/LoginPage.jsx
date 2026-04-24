@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { supabase } from "../services/supabase";
 import icon02 from "../../public/icon02.png";
-import { Mail, Lock, Wallet, ArrowRight, Eye, EyeOff } from "lucide-react";
+import { Mail, Lock, ArrowRight, Eye, EyeOff } from "lucide-react";
 import { motion } from "framer-motion";
 
 export default function LoginPage({ onSwitchToSignup }) {

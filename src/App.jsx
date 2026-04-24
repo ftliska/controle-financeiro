@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo, useEffect, useCallback } from "react";
 import { supabase } from "./services/supabase";
 import HomePage from "./scenes/HomePage";
 import LancamentosPage from "./scenes/LancamentosPage";
@@ -53,43 +53,53 @@ export default function App() {
     };
   }, []);
 
-  const loadLancamentos = async () => {
+  const loadLancamentos = useCallback(async () => {
     if (!user) return;
 
-    setLoading(true);
+    try {
+      setLoading(true);
 
-    const { data, error } = await supabase
-      .from("lancamentos")
-      .select("*")
-      .eq("user_id", user.id)
-      .order("data_vencimento", { ascending: true });
+      const { data, error } = await supabase
+        .from("lancamentos")
+        .select("*")
+        .eq("user_id", user.id)
+        .order("data_vencimento", { ascending: true });
 
-    if (error) {
-      console.error(error);
+      if (error) {
+        console.error(error);
+        setLoading(false);
+        return;
+      }
+
+      setLancamentos(
+        data.map((l) => ({
+          id: l.id,
+          dataLancamento: l.data_lancamento,
+          dataVencimento: l.data_vencimento,
+          descricao: l.descricao,
+          categoria: l.categoria,
+          tipo: l.tipo,
+          valor: l.valor,
+          status: l.status,
+          obs: l.obs,
+        })),
+      );
+    } catch (e) {
+      console.error(e);
+    } finally {
       setLoading(false);
-      return;
     }
-
-    setLancamentos(
-      data.map((l) => ({
-        id: l.id,
-        dataLancamento: l.data_lancamento,
-        dataVencimento: l.data_vencimento,
-        descricao: l.descricao,
-        categoria: l.categoria,
-        tipo: l.tipo,
-        valor: l.valor,
-        status: l.status,
-        obs: l.obs,
-      })),
-    );
-
-    setLoading(false);
-  };
+  }, [user]);
 
   useEffect(() => {
-    if (user) loadLancamentos();
-  }, [user]);
+    if (!user) return;
+
+    const fetchData = async () => {
+      await loadLancamentos();
+    };
+
+    fetchData();
+  }, [user, loadLancamentos]);
 
   const handleLogout = async () => {
     await supabase.auth.signOut();

@@ -2,7 +2,6 @@ import { useState, useRef } from "react";
 import {
   Mail,
   Lock,
-  Wallet,
   ArrowRight,
   Eye,
   EyeOff,

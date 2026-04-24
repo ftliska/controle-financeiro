@@ -1,7 +1,5 @@
 import { useState } from "react";
-import { Pencil, X } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
-import { CADASTROS, INITIAL_FORM } from "../Constants";
 import ModalCadastro from "../components/ModalCadastro";
 import ButtonsLancamento from "../components/ButtonsLancamento";
 import TabelaLancamentos from "../components/TabelaLancamentos";

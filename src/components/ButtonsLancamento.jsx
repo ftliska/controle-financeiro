@@ -1,4 +1,4 @@
-import { Pencil, X, Check, Plus, EyeOff, Eye, ArrowUpDown } from "lucide-react";
+import { Plus, EyeOff, Eye, ArrowUpDown } from "lucide-react";
 import { INITIAL_FORM } from "../Constants";
 
 export default function ButtonsLancamento({
