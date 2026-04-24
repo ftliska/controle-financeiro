@@ -5,30 +5,44 @@ import LancamentosPage from "./scenes/LancamentosPage";
 import CadastroPage from "./scenes/CadastroPage";
 import LoginPage from "./scenes/LoginPage";
 import SignupPage from "./scenes/SignupPage";
-import { CADASTROS, INITIAL_FORM } from "./Constants";
-import { formatDateLocal, parseDateLocal, createLancamentos } from "./Utils";
+import { INITIAL_FORM } from "./Constants";
+import { parseDateLocal } from "./Utils";
 import NavbarHeader from "./components/NavbarHeader";
 import ToastConfirmacao from "./components/ToastConfirmacao";
+import { useLancamentos } from "./hooks/useLancamentos";
 
 export default function App() {
   const [page, setPage] = useState("home");
   const [user, setUser] = useState(null);
   const [isLogin, setIsLogin] = useState(true);
-  const [loading, setLoading] = useState(true);
-  const [saving, setSaving] = useState(false);
   const [year, setYear] = useState(() => {
     const saved = Number(localStorage.getItem("selectedYear"));
     const current = new Date().getFullYear();
     return saved && saved > 2000 && saved < 2100 ? saved : current;
   });
-
-  const [lancamentos, setLancamentos] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [form, setForm] = useState(INITIAL_FORM);
   const [editingId, setEditingId] = useState(null);
   const [confirmDelete, setConfirmDelete] = useState(null);
   const [hidePaid, setHidePaid] = useState(false);
   const [toast, setToast] = useState(null);
+
+  const showToast = useCallback((message, type = "success") => {
+    setToast({ message, type });
+
+    setTimeout(() => {
+      setToast(null);
+    }, 2500);
+  }, []);
+
+  const {
+    lancamentos,
+    loading,
+    saving,
+    handleConfirm,
+    updateLancamento,
+    deleteLancamento,
+  } = useLancamentos(user, showToast);
 
   useEffect(() => {
     localStorage.setItem("selectedYear", year);
@@ -53,231 +67,47 @@ export default function App() {
     };
   }, []);
 
-  const loadLancamentos = useCallback(async () => {
-    if (!user) return;
-
-    try {
-      setLoading(true);
-
-      const { data, error } = await supabase
-        .from("lancamentos")
-        .select("*")
-        .eq("user_id", user.id)
-        .order("data_vencimento", { ascending: true });
-
-      if (error) {
-        console.error(error);
-        setLoading(false);
-        return;
-      }
-
-      setLancamentos(
-        data.map((l) => ({
-          id: l.id,
-          dataLancamento: l.data_lancamento,
-          dataVencimento: l.data_vencimento,
-          descricao: l.descricao,
-          categoria: l.categoria,
-          tipo: l.tipo,
-          valor: l.valor,
-          status: l.status,
-          obs: l.obs,
-        })),
-      );
-    } catch (e) {
-      console.error(e);
-    } finally {
-      setLoading(false);
-    }
-  }, [user]);
-
-  useEffect(() => {
-    if (!user) return;
-
-    const fetchData = async () => {
-      await loadLancamentos();
-    };
-
-    fetchData();
-  }, [user, loadLancamentos]);
-
   const handleLogout = async () => {
     await supabase.auth.signOut();
   };
 
-  const handleConfirm = async () => {
-    try {
-      setSaving(true);
+  const buildProcessData = useCallback(
+    (targetYear) => {
+      const data = { entradas: {}, saidas: {}, economias: {} };
 
-      const cadastro = CADASTROS.find((c) => c.descricao === form.descricao);
-      if (!cadastro) return;
+      lancamentos.forEach((l) => {
+        if (!l.dataVencimento || !l.valor) return;
 
-      const valor = Number(form.valor);
-      const hoje = formatDateLocal(new Date());
+        const date = parseDateLocal(l.dataVencimento);
+        if (!date || date.getFullYear() !== targetYear) return;
 
-      if (editingId) {
-        const { error } = await supabase
-          .from("lancamentos")
-          .update({
-            data_vencimento: form.dataVencimento,
-            descricao: form.descricao,
-            categoria: cadastro.categoria,
-            tipo: cadastro.tipo,
-            valor: valor,
-            status: form.status,
-            obs: form.obs,
-          })
-          .eq("id", editingId);
+        const monthIndex = date.getMonth();
+        const categoria = l.descricao || "Sem categoria";
+        const valor = Number(l.valor);
 
-        if (error) throw error;
-      } else {
-        const novos = createLancamentos(form, cadastro, valor, hoje).map(
-          (l) => ({
-            user_id: user.id,
-            data_lancamento: l.dataLancamento,
-            data_vencimento: l.dataVencimento,
-            descricao: l.descricao,
-            categoria: l.categoria,
-            tipo: l.tipo,
-            valor: l.valor,
-            status: l.status,
-            obs: l.obs,
-          }),
-        );
+        let target;
+        if (l.tipo === "Receita") target = data.entradas;
+        else if (l.tipo === "Despesa") target = data.saidas;
+        else target = data.economias;
 
-        const { error } = await supabase.from("lancamentos").insert(novos);
-        if (error) throw error;
-      }
+        if (!target[categoria]) target[categoria] = Array(12).fill(0);
+        target[categoria][monthIndex] += valor;
+      });
 
-      await loadLancamentos();
+      return data;
+    },
+    [lancamentos],
+  );
 
-      showToast(
-        `Lançamento ${editingId ? "atualizado" : "criado"} com sucesso!`,
-      );
+  const processData = useMemo(
+    () => buildProcessData(year),
+    [buildProcessData, year],
+  );
 
-      setEditingId(null);
-      setShowModal(false);
-      setForm(INITIAL_FORM);
-    } catch (error) {
-      console.error(error);
-      showToast("Erro ao salvar", "error");
-    } finally {
-      setSaving(false);
-    }
-  };
-
-  const deleteLancamento = async (id) => {
-    const { error } = await supabase.from("lancamentos").delete().eq("id", id);
-
-    if (error) {
-      showToast("Erro ao excluir", "error");
-      throw error;
-    }
-
-    await loadLancamentos();
-    showToast("Lançamento excluído com sucesso!");
-  };
-
-  const updateLancamento = async (id, field, value) => {
-    // 1. Atualiza UI imediatamente (otimista)
-    setLancamentos((prev) =>
-      prev.map((l) =>
-        l.id === id ? { ...l, [field]: value, _updating: true } : l,
-      ),
-    );
-
-    // 2. Persiste no backend
-    const { error } = await supabase
-      .from("lancamentos")
-      .update({
-        [mapField(field)]: value,
-      })
-      .eq("id", id);
-
-    if (error) {
-      console.error(error);
-      showToast("Erro ao atualizar", "error");
-
-      // rollback
-      await loadLancamentos();
-      return;
-    }
-
-    // 3. Remove flag de loading
-    setLancamentos((prev) =>
-      prev.map((l) => (l.id === id ? { ...l, _updating: false } : l)),
-    );
-  };
-
-  const mapField = (field) => {
-    const map = {
-      dataLancamento: "data_lancamento",
-      dataVencimento: "data_vencimento",
-      descricao: "descricao",
-      categoria: "categoria",
-      tipo: "tipo",
-      valor: "valor",
-      status: "status",
-      obs: "obs",
-    };
-
-    return map[field] || field;
-  };
-
-  const showToast = (message, type = "success") => {
-    setToast({ message, type });
-    setTimeout(() => setToast(null), 2500);
-  };
-
-  const processData = useMemo(() => {
-    const data = { entradas: {}, saidas: {}, economias: {} };
-
-    lancamentos.forEach((l) => {
-      if (!l.dataVencimento || !l.valor) return;
-
-      const date = parseDateLocal(l.dataVencimento);
-      if (!date || date.getFullYear() !== year) return;
-
-      const monthIndex = date.getMonth();
-      const categoria = l.descricao || "Sem categoria";
-      const valor = Number(l.valor);
-
-      let target;
-      if (l.tipo === "Receita") target = data.entradas;
-      else if (l.tipo === "Despesa") target = data.saidas;
-      else target = data.economias;
-
-      if (!target[categoria]) target[categoria] = Array(12).fill(0);
-      target[categoria][monthIndex] += valor;
-    });
-
-    return data;
-  }, [lancamentos, year]);
-
-  const processDataPrevYear = useMemo(() => {
-    const data = { entradas: {}, saidas: {}, economias: {} };
-
-    lancamentos.forEach((l) => {
-      if (!l.dataVencimento || !l.valor) return;
-
-      const date = parseDateLocal(l.dataVencimento);
-      if (!date || date.getFullYear() !== year - 1) return;
-
-      const monthIndex = date.getMonth();
-      const categoria = l.descricao || "Sem categoria";
-      const valor = Number(l.valor);
-
-      let target;
-      if (l.tipo === "Receita") target = data.entradas;
-      else if (l.tipo === "Despesa") target = data.saidas;
-      else target = data.economias;
-
-      if (!target[categoria]) target[categoria] = Array(12).fill(0);
-      target[categoria][monthIndex] += valor;
-    });
-
-    return data;
-  }, [lancamentos, year]);
+  const processDataPrevYear = useMemo(
+    () => buildProcessData(year - 1),
+    [buildProcessData, year],
+  );
 
   const summary = useMemo(() => {
     const sum = (obj) =>
@@ -313,6 +143,14 @@ export default function App() {
     );
   }
 
+  const onConfirm = () => {
+    handleConfirm(form, editingId, (initial) => {
+      setForm(initial);
+      setEditingId(null);
+      setShowModal(false);
+    });
+  };
+
   return (
     <div className="min-h-screen bg-[#14171F] text-white">
       <NavbarHeader
@@ -343,7 +181,7 @@ export default function App() {
           setShowModal={setShowModal}
           form={form}
           setForm={setForm}
-          handleConfirm={handleConfirm}
+          handleConfirm={onConfirm}
           setEditingId={setEditingId}
           editingId={editingId}
           hidePaid={hidePaid}

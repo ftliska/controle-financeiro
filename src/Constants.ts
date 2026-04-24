@@ -238,3 +238,14 @@ export const NAV_ITENS = [
   { page: "lancamentos", icon: List, label: "Lançamentos" },
   { page: "cadastro", icon: Settings, label: "Cadastro" },
 ];
+
+export const FIELD_MAP = {
+  dataLancamento: "data_lancamento",
+  dataVencimento: "data_vencimento",
+  descricao: "descricao",
+  categoria: "categoria",
+  tipo: "tipo",
+  valor: "valor",
+  status: "status",
+  obs: "obs",
+};
