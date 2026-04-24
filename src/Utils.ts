@@ -63,6 +63,8 @@ export const createLancamentos = (form, cadastro, valor, hoje) => {
     const pagas = Number(form.parcelasPagas) || 0;
     const total = Number(form.parcelasTotais) || 0;
     const restantes = total - pagas;
+    const totalFormatado = String(total).padStart(2, "0");
+    const obsBase = form.obs?.trim();
     for (let i = 0; i < restantes; i++) {
       const [year, month, day] = form.dataVencimento.split("-");
       const baseYear = Number(year);
@@ -74,6 +76,13 @@ export const createLancamentos = (form, cadastro, valor, hoje) => {
       const adjustedMonth = ((newMonth % 12) + 12) % 12;
 
       const data = getSafeDate(newYear, adjustedMonth, baseDay);
+
+      const numeroParcela = String(pagas + i + 1).padStart(2, "0");
+
+      const obsFinal = obsBase
+        ? `${obsBase} - Parcela ${numeroParcela}/${totalFormatado}`
+        : `Parcela ${numeroParcela}/${totalFormatado}`;
+
       novos.push({
         id: crypto.randomUUID(),
         dataLancamento: hoje,
@@ -83,7 +92,7 @@ export const createLancamentos = (form, cadastro, valor, hoje) => {
         tipo: cadastro.tipo,
         valor: valorEmCentavos,
         status: form.status,
-        obs: `Parcela ${String(pagas + i + 1).padStart(2, "0")}/${total}`,
+        obs: obsFinal,
       });
     }
   } else {
