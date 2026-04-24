@@ -1,8 +1,8 @@
 import { AnimatePresence, motion } from "framer-motion";
 import CardsHome from "../components/CardsHome";
 import TabelaHome from "../components/TabelaHome";
-import SummarySkeleton from "../components/SummarySkeleton";
-import TableSkeleton from "../components/TableSkeleton";
+import AccordionSection from "../components/AccordionSection";
+import { PiggyBank, TrendingDown, TrendingUp } from "lucide-react";
 
 export default function HomePage({
   summary,
@@ -25,20 +25,16 @@ export default function HomePage({
           exit={{ opacity: 0, y: -10 }}
           transition={{ duration: 0.3 }}
         >
-          {loading ? (
-            <SummarySkeleton />
-          ) : (
-            <CardsHome
-              summary={summary}
-              summaryPrevYear={summaryPrevYear}
-              year={year}
-              setYear={setYear}
-              datasetEntradas={processData.entradas}
-              datasetSaidas={processData.saidas}
-              datasetEconomias={processData.economias}
-              processDataPrevYear={processDataPrevYear}
-            />
-          )}
+          <CardsHome
+            summary={summary}
+            summaryPrevYear={summaryPrevYear}
+            year={year}
+            setYear={setYear}
+            datasetEntradas={processData.entradas}
+            datasetSaidas={processData.saidas}
+            datasetEconomias={processData.economias}
+            processDataPrevYear={processDataPrevYear}
+          />
         </motion.div>
       </AnimatePresence>
 
@@ -52,42 +48,52 @@ export default function HomePage({
           transition={{ duration: 0.3, delay: 0.05 }}
           className="space-y-6"
         >
-          {loading ? (
-            <>
-              <TableSkeleton />
-              <TableSkeleton />
-              <TableSkeleton />
-            </>
-          ) : (
-            <>
-              <TabelaHome
-                dataset={processData.entradas}
-                getIcon={getIcon}
-                color="text-emerald-400"
-                titulo="Entradas"
-                tipo="Receita"
-                year={year}
-              />
-
-              <TabelaHome
-                dataset={processData.saidas}
-                getIcon={getIcon}
-                color="text-red-400"
-                titulo="Saídas"
-                tipo="Despesa"
-                year={year}
-              />
-
-              <TabelaHome
-                dataset={processData.economias}
-                getIcon={getIcon}
-                color="text-blue-400"
-                titulo="Economias"
-                tipo="Investimento"
-                year={year}
-              />
-            </>
-          )}
+          <AccordionSection
+            title="Entradas"
+            total={summary.entradas}
+            icon={<TrendingUp className="text-emerald-400" />}
+            color="text-emerald-400"
+            defaultOpen={true}
+          >
+            <TabelaHome
+              dataset={processData.entradas}
+              getIcon={getIcon}
+              color="text-emerald-400"
+              titulo="Entradas"
+              tipo="Receita"
+              year={year}
+            />
+          </AccordionSection>
+          <AccordionSection
+            title="Saídas"
+            total={summary.saidas}
+            icon={<TrendingDown className="text-red-400" />}
+            color="text-red-400"
+          >
+            <TabelaHome
+              dataset={processData.saidas}
+              getIcon={getIcon}
+              color="text-red-400"
+              titulo="Saídas"
+              tipo="Despesa"
+              year={year}
+            />
+          </AccordionSection>
+          <AccordionSection
+            title="Economias"
+            total={summary.economias}
+            icon={<PiggyBank className="text-blue-400" />}
+            color="text-blue-400"
+          >
+            <TabelaHome
+              dataset={processData.economias}
+              getIcon={getIcon}
+              color="text-blue-400"
+              titulo="Economias"
+              tipo="Investimento"
+              year={year}
+            />
+          </AccordionSection>
         </motion.div>
       </AnimatePresence>
     </div>
